@@ -1,0 +1,1575 @@
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ILO — ilanpa.com WhatsApp AI Agent</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;700&family=Orbitron:wght@400;700;900&display=swap" rel="stylesheet">
+<style>
+/* ── TOKENS ─────────────────────────────── */
+:root {
+  --ink: #0a0a0f;
+  --cream: #f5f0e8;
+  --gold: #c9a84c;
+  --gold-light: #e8d48e;
+  --rust: #b84c2a;
+  --sage: #3d5a47;
+  --muted: #7a7468;
+  --blue: #6b20ee;
+  --cyan: #d010d8;
+  --border: rgba(201,168,76,0.2);
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  background: var(--cream);
+  color: var(--ink);
+  font-family: 'DM Sans', sans-serif;
+  font-weight: 300;
+  line-height: 1.7;
+}
+
+/* ── HERO ─────────────────────────────── */
+.hero {
+  background: var(--ink);
+  color: var(--cream);
+  padding: 100px 60px 80px;
+  position: relative;
+  overflow: hidden;
+  display: grid;
+  grid-template-columns: 1.1fr 0.9fr;
+  gap: 40px;
+  min-height: 100vh;
+}
+
+.hero::before {
+  content: '';
+  position: absolute;
+  top: -80px; right: -80px;
+  width: 420px; height: 420px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(201,168,76,0.18) 0%, transparent 70%);
+}
+
+.hero-orb {
+  position: absolute;
+  width: 800px; height: 800px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(107,32,238,0.14) 0%, transparent 65%);
+  top: -200px; left: -200px;
+  pointer-events: none;
+}
+
+.hero-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  border: 1px solid var(--gold);
+  color: var(--gold);
+  font-size: 11px;
+  letter-spacing: 2.5px;
+  text-transform: uppercase;
+  padding: 6px 18px;
+  margin-bottom: 40px;
+  font-weight: 500;
+}
+
+.live-dot {
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  background: var(--gold);
+  animation: blink 1.5s step-end infinite;
+}
+
+@keyframes blink { 0%,100%{opacity:1;}50%{opacity:0;} }
+
+.hero h1 {
+  font-family: 'Orbitron', monospace;
+  font-size: clamp(42px, 5vw, 72px);
+  font-weight: 900;
+  line-height: 1.05;
+  letter-spacing: -1px;
+  color: var(--cream);
+  max-width: 700px;
+}
+
+.hero h1 .accent { color: var(--gold); }
+.hero h1 .accent2 { color: #d010d8; }
+
+.hero-sub {
+  margin-top: 32px;
+  font-size: 17px;
+  color: #b0a898;
+  max-width: 560px;
+  font-weight: 300;
+  line-height: 1.9;
+}
+
+.hero-sub strong { color: var(--gold); font-weight: 500; }
+
+.hero-stats {
+  display: flex;
+  gap: 0;
+  margin-top: 60px;
+  border: 1px solid rgba(255,255,255,0.1);
+}
+
+.stat {
+  flex: 1;
+  padding: 20px 24px;
+  border-right: 1px solid rgba(255,255,255,0.1);
+}
+
+.stat:last-child { border-right: none; }
+
+.stat-num {
+  font-family: 'Orbitron', monospace;
+  font-size: 32px;
+  font-weight: 700;
+  color: var(--gold);
+}
+
+.stat-label {
+  font-size: 11px;
+  color: #7a7468;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  margin-top: 4px;
+}
+
+/* ── PHONE ── */
+.hero-right {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+}
+
+.phone-wrap {
+  animation: float 7s ease-in-out infinite;
+  position: relative;
+}
+
+.phone-wrap::before {
+  content: '';
+  position: absolute;
+  bottom: -40px; left: 50%;
+  transform: translateX(-50%);
+  width: 160px; height: 20px;
+  background: radial-gradient(ellipse, rgba(201,168,76,0.3) 0%, transparent 70%);
+  filter: blur(8px);
+}
+
+@keyframes float { 0%,100%{transform:translateY(0);}50%{transform:translateY(-14px);} }
+
+.phone {
+  width: 280px;
+  background: #1a1a2e;
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 32px;
+  overflow: hidden;
+  box-shadow: 0 40px 80px rgba(0,0,0,0.7);
+}
+
+.phone-header {
+  background: #0d0d1a;
+  padding: 14px 18px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  border-bottom: 1px solid rgba(255,255,255,0.1);
+}
+
+.p-avatar {
+  width: 36px; height: 36px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--gold), #a08030);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+}
+
+.p-name { font-size: 13px; font-weight: 500; color: #fff; }
+.p-status { font-size: 10px; color: var(--gold); letter-spacing: 1px; }
+
+.phone-body {
+  padding: 14px 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-height: 440px;
+  background: #0a0a15;
+}
+
+.bbl {
+  max-width: 88%;
+  padding: 9px 13px;
+  font-size: 11.5px;
+  line-height: 1.6;
+  animation: fadeUp 0.4s ease both;
+}
+
+.bbl-in {
+  background: #1a1a2e;
+  border: 1px solid rgba(255,255,255,0.1);
+  color: #ddd;
+  align-self: flex-start;
+  border-radius: 4px 12px 12px 4px;
+}
+
+.bbl-out {
+  background: linear-gradient(135deg, #c9a84c, #a08030);
+  border: 1px solid rgba(201,168,76,0.4);
+  color: #1a1a2e;
+  align-self: flex-end;
+  border-radius: 12px 4px 4px 12px;
+  text-align: right;
+}
+
+.bbl strong { color: #fff; font-weight: 500; }
+.bbl-time { font-size: 9px; color: #7a7468; margin-top: 3px; }
+
+@keyframes fadeUp { from{opacity:0;transform:translateY(10px);}to{opacity:1;transform:translateY(0);} }
+
+/* ── SECTIONS ─────────────────────────── */
+.section {
+  padding: 80px 60px;
+}
+
+.section-alt {
+  background: #f0ebe0;
+}
+
+.section-dark {
+  background: var(--ink);
+  color: var(--cream);
+}
+
+.section-sage {
+  background: var(--sage);
+  color: var(--cream);
+}
+
+.section-label {
+  font-size: 11px;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: var(--muted);
+  font-weight: 500;
+  margin-bottom: 16px;
+}
+
+.section-dark .section-label {
+  color: var(--gold);
+}
+
+.section-sage .section-label {
+  color: var(--gold-light);
+}
+
+.section-title {
+  font-family: 'Playfair Display', serif;
+  font-size: clamp(32px, 4vw, 54px);
+  font-weight: 700;
+  line-height: 1.15;
+  max-width: 700px;
+}
+
+.section-dark .section-title {
+  color: var(--cream);
+}
+
+.section-sage .section-title {
+  color: var(--cream);
+}
+
+/* ── ILO IDENTITY ────────────────────── */
+.ilo-grid {
+  display: grid;
+  grid-template-columns: 300px 1fr;
+  gap: 60px;
+  margin-top: 60px;
+  align-items: start;
+}
+
+.ilo-card {
+  background: var(--cream);
+  border: 1px solid var(--border);
+  padding: 36px;
+  position: relative;
+  overflow: hidden;
+}
+
+.ilo-card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, var(--gold), #a08030, transparent);
+}
+
+.ilo-card::after {
+  content: 'ILO';
+  position: absolute;
+  bottom: -20px; right: -10px;
+  font-family: 'Orbitron', monospace;
+  font-size: 80px;
+  font-weight: 900;
+  color: rgba(201,168,76,0.05);
+  letter-spacing: -4px;
+}
+
+.ilo-av {
+  width: 70px; height: 70px;
+  background: linear-gradient(135deg, var(--gold), #a08030);
+  border: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 30px;
+  margin-bottom: 20px;
+  position: relative;
+}
+
+.ilo-av::after {
+  content: '';
+  position: absolute;
+  inset: -4px;
+  border: 1px solid rgba(201,168,76,0.25);
+  animation: ring2 3s ease-in-out infinite;
+}
+
+@keyframes ring2 { 0%,100%{opacity:0.5;transform:scale(1);}50%{opacity:0.1;transform:scale(1.08);} }
+
+.ilo-name {
+  font-family: 'Orbitron', monospace;
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--ink);
+}
+
+.ilo-role {
+  font-size: 10px;
+  color: var(--gold);
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  margin-top: 4px;
+}
+
+.ilo-desc {
+  margin-top: 18px;
+  font-size: 14px;
+  color: var(--muted);
+  line-height: 1.8;
+}
+
+.lang-pills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 20px;
+}
+
+.lpill {
+  font-size: 10px;
+  border: 1px solid var(--border);
+  color: var(--gold);
+  padding: 3px 10px;
+  letter-spacing: 0.5px;
+  background: rgba(201,168,76,0.06);
+}
+
+.ilo-traits {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.trait {
+  display: grid;
+  grid-template-columns: 40px 1fr;
+  gap: 16px;
+  align-items: start;
+  padding: 20px;
+  border: 1px solid var(--border);
+  background: var(--cream);
+  transition: border-color 0.2s;
+}
+
+.trait:hover { border-color: var(--gold); }
+
+.t-icon {
+  width: 40px; height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  background: rgba(201,168,76,0.06);
+  border: 1px solid var(--border);
+  flex-shrink: 0;
+}
+
+.t-title { font-size: 15px; font-weight: 500; color: var(--ink); margin-bottom: 4px; }
+.t-text { font-size: 13px; color: var(--muted); line-height: 1.7; }
+
+/* ── SERVICES ───────────────────────── */
+.svc-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  margin-bottom: 48px;
+  flex-wrap: wrap;
+  gap: 20px;
+}
+
+.big-num {
+  font-family: 'Playfair Display', serif;
+  font-size: 120px;
+  font-weight: 900;
+  color: transparent;
+  -webkit-text-stroke: 1px var(--gold);
+  line-height: 1;
+}
+
+.svc-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 2px;
+  margin-top: 60px;
+}
+
+.svc {
+  background: var(--cream);
+  border: 1px solid var(--border);
+  padding: 32px 28px;
+  transition: background 0.2s;
+  border-top: 2px solid transparent;
+}
+
+.svc:hover {
+  background: #fff;
+  border-top-color: var(--gold);
+}
+
+.svc-icon { font-size: 24px; margin-bottom: 14px; }
+
+.svc-name {
+  font-family: 'Orbitron', monospace;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--ink);
+  margin-bottom: 14px;
+  letter-spacing: 0.5px;
+}
+
+.svc-item {
+  font-size: 12px;
+  color: var(--muted);
+  padding: 3px 0 3px 12px;
+  position: relative;
+  line-height: 1.6;
+}
+
+.svc-item::before {
+  content: '›';
+  position: absolute;
+  left: 0;
+  color: var(--gold);
+}
+
+/* ── STAR FEATURES ───────────────────── */
+.cap-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+  gap: 0;
+  margin-top: 60px;
+  border: 1px solid rgba(255,255,255,0.08);
+}
+
+.cap-item {
+  background: rgba(255,255,255,0.03);
+  padding: 40px;
+  border-right: 1px solid rgba(255,255,255,0.08);
+  border-bottom: 1px solid rgba(255,255,255,0.08);
+  position: relative;
+  transition: background 0.2s;
+}
+
+.cap-item:hover { background: rgba(201,168,76,0.06); }
+
+.cap-number {
+  font-family: 'Orbitron', monospace;
+  font-size: 11px;
+  letter-spacing: 2px;
+  color: var(--gold);
+  margin-bottom: 20px;
+}
+
+.cap-title {
+  font-family: 'Playfair Display', serif;
+  font-size: 22px;
+  font-weight: 700;
+  margin-bottom: 14px;
+}
+
+.cap-desc {
+  font-size: 14px;
+  color: #8a8278;
+  line-height: 1.8;
+  margin-bottom: 16px;
+}
+
+/* Terminal */
+.term {
+  background: var(--cream);
+  border: 1px solid var(--border);
+  padding: 14px 16px;
+  font-family: 'Courier New', monospace;
+  font-size: 11.5px;
+  line-height: 1.9;
+  color: var(--ink);
+  position: relative;
+  overflow: hidden;
+}
+
+.term::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, var(--gold), transparent);
+}
+
+.tc { color: var(--rust); font-weight: 500; }
+.tb { color: var(--gold); font-weight: 500; }
+.tw { color: #1a4a8f; font-weight: 500; }
+.to { color: var(--rust); }
+.tm { color: var(--muted); }
+
+/* ── FLOW ───────────────────────────── */
+.flow {
+  display: flex;
+  gap: 2px;
+  background: var(--border);
+  margin-top: 48px;
+}
+
+.flow-step {
+  flex: 1;
+  background: var(--cream);
+  padding: 28px 18px;
+  text-align: center;
+  position: relative;
+  transition: background 0.2s;
+}
+
+.flow-step:hover { background: #fff; }
+
+.flow-step::after {
+  content: '›';
+  position: absolute;
+  right: -8px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--gold);
+  font-size: 20px;
+  z-index: 2;
+  background: var(--border);
+  padding: 0 4px;
+}
+
+.flow-step:last-child::after { display: none; }
+
+.f-icon { font-size: 26px; margin-bottom: 10px; }
+.f-title { font-size: 12px; font-weight: 500; color: var(--ink); margin-bottom: 4px; }
+.f-sub { font-size: 11px; color: var(--muted); }
+
+.cat-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 2px;
+  margin-top: 2px;
+}
+
+.cat {
+  background: var(--cream);
+  padding: 14px 18px;
+  font-size: 12px;
+  color: var(--muted);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  transition: background 0.15s;
+}
+
+.cat:hover { background: #fff; color: var(--ink); }
+.cdot { width: 4px; height: 4px; background: var(--gold); flex-shrink: 0; }
+
+/* ── USER TYPES ──────────────────────── */
+.usecase-list {
+  margin-top: 50px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.usecase-row {
+  display: grid;
+  grid-template-columns: 200px 1fr;
+  gap: 2px;
+  background: var(--ink);
+}
+
+.usecase-cell {
+  background: var(--cream);
+  padding: 28px 32px;
+}
+
+.usecase-who {
+  background: var(--ink);
+  color: var(--gold);
+  display: flex;
+  align-items: center;
+  font-size: 13px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  font-weight: 500;
+  padding: 28px 32px;
+}
+
+.u-pain { font-weight: 500; font-size: 15px; }
+.u-sol { font-size: 14px; color: var(--sage); font-weight: 400; }
+.u-sol strong { color: var(--gold); }
+
+/* ── LOYALTY ───────────────────────── */
+.loyalty-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 2px;
+  margin-top: 60px;
+  background: var(--border);
+}
+
+.loyalty-side {
+  background: var(--cream);
+  padding: 40px;
+}
+
+.badge-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 24px;
+}
+
+.badge-table tr {
+  border-bottom: 1px solid var(--border);
+  transition: background 0.15s;
+}
+
+.badge-table tr:last-child { border-bottom: none; }
+.badge-table tr:hover { background: #fff; }
+
+.badge-table td {
+  padding: 12px 8px;
+  font-size: 12.5px;
+  vertical-align: middle;
+}
+
+.badge-table td:first-child { width: 30px; }
+.badge-table .bn { color: var(--ink); font-weight: 500; }
+.badge-table .bp { color: var(--muted); font-size: 11px; }
+.badge-table .bperk { color: var(--gold); font-size: 11px; text-align: right; }
+
+.active-row { background: rgba(201,168,76,0.08) !important; }
+.active-row .bn { color: var(--gold); }
+
+.point-table { margin-top: 24px; display: flex; flex-direction: column; gap: 2px; }
+
+.pt-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 14px 16px;
+  background: rgba(201,168,76,0.04);
+  border: 1px solid var(--border);
+  transition: border-color 0.15s;
+}
+
+.pt-row:hover { border-color: rgba(201,168,76,0.3); }
+
+.pt-name { font-size: 13px; color: var(--ink); }
+
+.pt-pts {
+  font-family: 'Orbitron', monospace;
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--gold);
+}
+
+.pt-unit { font-size: 10px; color: var(--muted); font-weight: 300; }
+
+/* ── COMPARISON ─────────────────────── */
+.compare-wrap { overflow-x: auto; margin-top: 60px; }
+
+table.cmp {
+  width: 100%;
+  border-collapse: collapse;
+  border: 1px solid var(--border);
+  min-width: 600px;
+}
+
+.cmp th {
+  padding: 16px 20px;
+  font-size: 12px;
+  font-weight: 700;
+  text-align: center;
+  border-bottom: 1px solid var(--border);
+  border-right: 1px solid var(--border);
+  font-family: 'Orbitron', monospace;
+  letter-spacing: 0.5px;
+}
+
+.cmp th:first-child { text-align: left; color: var(--muted); font-family: 'DM Sans', sans-serif; font-weight: 400; }
+.cmp th.hl { background: rgba(201,168,76,0.08); color: var(--gold); border-top: 2px solid var(--gold); }
+
+.cmp td {
+  padding: 12px 20px;
+  font-size: 12.5px;
+  color: var(--ink);
+  border-bottom: 1px solid var(--border);
+  border-right: 1px solid var(--border);
+  text-align: center;
+}
+
+.cmp td:first-child { text-align: left; color: var(--muted); font-size: 12px; }
+.cmp td.hl { background: rgba(201,168,76,0.03); }
+.cmp tr:last-child td { border-bottom: none; }
+
+.ck { color: var(--sage); }
+.cx { color: #2a1818; }
+.cp { color: var(--rust); font-size: 11px; }
+
+/* ── TRUTH SHIELD ────────────────────── */
+.truth-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 2px;
+  margin-top: 60px;
+  background: var(--border);
+}
+
+.truth-side {
+  background: var(--cream);
+  padding: 40px;
+}
+
+.scenario {
+  padding: 14px 0;
+  border-bottom: 1px solid var(--border);
+}
+
+.scenario:last-child { border-bottom: none; }
+
+.s-q {
+  font-size: 10px;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-bottom: 5px;
+}
+
+.s-wrong {
+  font-size: 11.5px;
+  color: #b84c2a;
+  text-decoration: line-through;
+  margin-bottom: 3px;
+}
+
+.s-right {
+  font-size: 12.5px;
+  color: var(--ink);
+}
+
+.s-right::before { content: '✓ '; color: var(--gold); }
+
+.truth-stats {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.t-stat {
+  background: rgba(201,168,76,0.04);
+  border-left: 3px solid var(--gold);
+  padding: 28px 24px;
+  flex: 1;
+}
+
+.t-stat:nth-child(2) { border-left-color: var(--rust); }
+.t-stat:nth-child(3) { border-left-color: var(--sage); }
+
+.ts-num {
+  font-family: 'Orbitron', monospace;
+  font-size: 48px;
+  font-weight: 900;
+  color: var(--gold);
+  line-height: 1;
+}
+
+.t-stat:nth-child(2) .ts-num { color: var(--rust); }
+.t-stat:nth-child(3) .ts-num { color: var(--sage); }
+
+.ts-text { font-size: 12.5px; color: var(--muted); margin-top: 8px; line-height: 1.7; }
+
+/* ── TECH STACK ─────────────────────── */
+.tech-wrap { padding: 80px 60px; position: relative; }
+
+.tech-pills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 40px;
+}
+
+.tp {
+  padding: 7px 18px;
+  border: 1px solid var(--border);
+  font-size: 12px;
+  color: var(--muted);
+  background: transparent;
+  letter-spacing: 0.3px;
+  transition: all 0.15s;
+  cursor: default;
+}
+
+.tp:hover { border-color: rgba(201,168,76,0.4); color: var(--ink); }
+.tp.core { background: rgba(201,168,76,0.08); border-color: rgba(201,168,76,0.3); color: var(--gold); }
+.tp.core:hover { color: var(--gold-light); border-color: var(--gold-light); background: rgba(201,168,76,0.12); }
+
+/* ── CTA ────────────────────────────── */
+.cta-section {
+  background: var(--ink);
+  color: var(--cream);
+  padding: 100px 60px;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+}
+
+.cta-section::before {
+  content: '';
+  position: absolute;
+  width: 600px; height: 600px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(201,168,76,0.1) 0%, transparent 65%);
+  left: 50%; top: 50%;
+  transform: translate(-50%,-50%);
+  pointer-events: none;
+}
+
+.cta-label {
+  font-size: 11px;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: var(--gold);
+  margin-bottom: 24px;
+}
+
+.cta-section h2 {
+  font-family: 'Orbitron', monospace;
+  font-size: clamp(36px, 5vw, 64px);
+  font-weight: 900;
+  line-height: 1.1;
+  color: var(--cream);
+  position: relative;
+  z-index: 1;
+}
+
+.cta-section h2 .a1 { color: var(--gold); }
+.cta-section h2 .a2 { color: #d010d8; }
+
+.cta-sub {
+  margin: 24px auto 0;
+  font-size: 17px;
+  color: #7a7468;
+  max-width: 600px;
+  position: relative;
+  z-index: 1;
+}
+
+.cta-btns {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+  margin-top: 48px;
+  flex-wrap: wrap;
+  position: relative;
+  z-index: 1;
+}
+
+.btn-p {
+  background: var(--gold);
+  color: var(--ink);
+  font-family: 'DM Sans', sans-serif;
+  font-size: 13px;
+  font-weight: 500;
+  padding: 14px 36px;
+  border: none;
+  cursor: pointer;
+  letter-spacing: 1px;
+  text-decoration: none;
+  display: inline-block;
+  transition: all 0.2s;
+  text-transform: uppercase;
+}
+
+.btn-p:hover { background: var(--gold-light); transform: translateY(-2px); }
+
+.btn-s {
+  background: transparent;
+  color: var(--gold);
+  font-family: 'DM Sans', sans-serif;
+  font-size: 13px;
+  padding: 14px 36px;
+  border: 1px solid rgba(201,168,76,0.3);
+  cursor: pointer;
+  letter-spacing: 1px;
+  text-decoration: none;
+  display: inline-block;
+  transition: all 0.2s;
+  text-transform: uppercase;
+}
+
+.btn-s:hover { border-color: var(--gold); background: rgba(201,168,76,0.06); }
+
+.contact-row {
+  display: flex;
+  gap: 32px;
+  justify-content: center;
+  margin-top: 48px;
+  flex-wrap: wrap;
+  position: relative;
+  z-index: 1;
+}
+
+.ci { font-size: 12px; color: #7a7468; display: flex; align-items: center; gap: 8px; }
+.ci span { color: var(--cream); }
+
+/* ── FOOTER ──────────────────────────── */
+footer {
+  background: #050508;
+  color: #3a3830;
+  padding: 40px 60px;
+  font-size: 12px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.f-logo {
+  font-family: 'Orbitron', monospace;
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--cream);
+}
+
+.f-logo span { color: var(--gold); }
+.f-logo em { color: #d010d8; font-style: normal; font-size: 12px; margin-left: 8px; }
+
+/* ── ANIMATIONS ───────────────────────── */
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(30px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.hero h1, .hero-sub, .hero-badge { animation: fadeUp 0.8s ease both; }
+.hero h1 { animation-delay: 0.1s; }
+.hero-sub { animation-delay: 0.2s; }
+.hero-stats { animation: fadeUp 0.8s ease 0.3s both; }
+
+/* ── RESPONSIVE ───────────────────────── */
+@media(max-width: 900px){
+  .hero { grid-template-columns: 1fr; padding: 60px 24px; }
+  .hero-right { display: none; }
+  .section, .section-alt, .section-dark, .section-sage, .tech-wrap, .cta-section {
+    padding: 60px 24px;
+  }
+  .ilo-grid, .svc-grid, .cap-grid, .loyalty-grid, .truth-grid, .usecase-list { grid-template-columns: 1fr; }
+  .cat-grid { grid-template-columns: 1fr 1fr; }
+  .flow { flex-direction: column; }
+  .flow-step::after { display: none; }
+  .footer { flex-direction: column; gap: 12px; text-align: center; }
+  .hero-stats { flex-direction: column; }
+}
+</style>
+</head>
+<body>
+
+<!-- ═══════════════ HERO ═══════════════ -->
+<section class="hero">
+  <div class="hero-orb"></div>
+
+  <div>
+    <div class="hero-badge">
+      <div class="live-dot"></div>
+      ilanpa.com · WhatsApp AI · 2026
+    </div>
+
+    <h1>
+      EMLAK<br>
+      <span class="accent">SATIŞININ</span><br>
+      <span class="accent2">YENİ SESİ.</span>
+    </h1>
+
+    <p class="hero-sub">
+      <strong>ILO</strong> — ilanpa.com'un 50+ servisli WhatsApp yapay zeka agenti. Fotoğraf gönder, ilan açsın. Fiyat sor, piyasayı analiz etsin. Soru sor, doğru cevap versin. 7/24 kesintisiz.
+    </p>
+
+    <div class="hero-stats">
+      <div class="stat">
+        <div class="stat-num">50+</div>
+        <div class="stat-label">Aktif Servis</div>
+      </div>
+      <div class="stat">
+        <div class="stat-num">13</div>
+        <div class="stat-label">Hata Önleme</div>
+      </div>
+      <div class="stat">
+        <div class="stat-num">7/24</div>
+        <div class="stat-label">Otomatik</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="hero-right">
+    <div class="phone-wrap">
+      <div class="phone">
+        <div class="phone-header">
+          <div class="p-avatar">🏠</div>
+          <div>
+            <div class="p-name">ILO · ilanpa.com</div>
+            <div class="p-status">● ONLINE</div>
+          </div>
+        </div>
+        <div class="phone-body">
+          <div class="bbl bbl-out">
+            Dairem için fotoğraf atıyorum, satılık ilan açmak istiyorum
+            <div class="bbl-time">09:14 ✓✓</div>
+          </div>
+          <div class="bbl bbl-in">
+            📸 <strong>Fotoğraf analiz edildi</strong><br>
+            🏠 Konut / Tadilatlı Daire<br>
+            💰 Piyasa: <strong>4.2M – 4.8M TL</strong><br>
+            ✅ 6 alan otomatik dolduruldu<br>
+            📝 2 alan daha gerekiyor
+            <div class="bbl-time">09:14</div>
+          </div>
+          <div class="bbl bbl-out">
+            fiyat analizi yap
+            <div class="bbl-time">09:16 ✓✓</div>
+          </div>
+          <div class="bbl bbl-in">
+            📊 <strong>Fiyat Analizi</strong><br>
+            Medyan: 4.450.000 TL<br>
+            Senin: <strong>4.800.000 TL</strong> 🔴<br>
+            ⏱ ~110 gün → <strong>~45 güne inebilir</strong><br>
+            🎯 Öneri: 4.350.000 TL<br>
+            Güncelleyeyim mi?
+            <div class="bbl-time">09:16</div>
+          </div>
+          <div class="bbl bbl-in">
+            ✅ Güncellendi →&nbsp;<strong>4.350.000 TL</strong>
+            <div class="bbl-time">09:17</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════ ILO KİMLİK ═══════════════ -->
+<section class="section">
+  <div class="section-label">Agent Kimliği</div>
+  <h2 class="section-title">ILO <span style="color: var(--gold)">nedir?</span></h2>
+
+  <div class="ilo-grid">
+    <div class="ilo-card">
+      <div class="ilo-av">🏠</div>
+      <div class="ilo-name">ILO</div>
+      <div class="ilo-role">ilanpa.com · WhatsApp AI Agent</div>
+      <p class="ilo-desc">
+        ilanpa.com'un tek yetkili dijital sesi. Sıcak, kısa ve öz. Türkçe konuşur, doğru cevap verir, yanlış bilgi vermez. Emin olmadığı şeyi tahmin etmez — doğrudan iletişime yönlendirir.
+      </p>
+      <div class="lang-pills">
+        <span class="lpill">🇹🇷 Türkçe</span>
+        <span class="lpill">🇬🇧 English</span>
+        <span class="lpill">🇷🇺 Русский</span>
+        <span class="lpill">🇩🇰 Dansk</span>
+        <span class="lpill">7/24</span>
+        <span class="lpill">Doğruluk Kalkanı</span>
+      </div>
+    </div>
+
+    <div class="ilo-traits">
+      <div class="trait">
+        <div class="t-icon">🛡️</div>
+        <div>
+          <div class="t-title">Doğruluk Kalkanı</div>
+          <div class="t-text">13 önceden tespit edilmiş hata senaryosu. Her cevap Quality Validator'dan geçer. Hallucination önleme, gerçek zamanlı fact-check. Tüm testler geçti ✅</div>
+        </div>
+      </div>
+      <div class="trait">
+        <div class="t-icon">🏗️</div>
+        <div>
+          <div class="t-title">İş Modelini Doğru Anlatır</div>
+          <div class="t-text">ilanpa bir gayrimenkul bağlantı platformu — klasik ilan sitesi değil. Mülk Sahibi → Yetki → Emlak Ofisi → Alıcı akışını doğru şekilde açıklar. "Sahibinden.com gibi" demez.</div>
+        </div>
+      </div>
+      <div class="trait">
+        <div class="t-icon">🌍</div>
+        <div>
+          <div class="t-title">Uluslararası Hazır</div>
+          <div class="t-text">İngilizce, Rusça, Danca bilen Çözüm Ortakları mevcut. Yabancı alıcı sorularına doğru ve eksiksiz cevap. Alanya'nın uluslararası pazarına tam hazır.</div>
+        </div>
+      </div>
+      <div class="trait">
+        <div class="t-icon">🤝</div>
+        <div>
+          <div class="t-title">Zamanında İnsan'a Aktarım</div>
+          <div class="t-text">Dolandırıcılık, şikayet, 3 başarısız deneme — anında destek ekibine aktarım ve admin'e bildirim. Hiçbir kritik durum cevapsız kalmaz.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════ 50+ SERVİS ═══════════════ -->
+<section class="section section-alt">
+  <div class="svc-header">
+    <div>
+      <div class="section-label">Servis Mimarisi</div>
+      <h2 class="section-title">Tek numara.<br><span style="color: var(--gold)">50+ motor.</span></h2>
+    </div>
+    <div class="big-num">50+</div>
+  </div>
+
+  <div class="svc-grid">
+    <div class="svc">
+      <div class="svc-icon">📸</div>
+      <div class="svc-name">İLAN OLUŞTURMA</div>
+      <div class="svc-item">Fotoğraf → Otomatik ilan (GPT-4o Vision)</div>
+      <div class="svc-item">Ad Wizard — adım adım ilan sihirbazı</div>
+      <div class="svc-item">SEO başlık & açıklama üretici</div>
+      <div class="svc-item">Fotoğraf kalite & yüz analizi</div>
+      <div class="svc-item">Kategori otomatik tespiti</div>
+    </div>
+    <div class="svc">
+      <div class="svc-icon">💰</div>
+      <div class="svc-name">FİYAT & PİYASA</div>
+      <div class="svc-item">Gerçek zamanlı rakip fiyat analizi</div>
+      <div class="svc-item">Min / Maks / Medyan / Ortalama</div>
+      <div class="svc-item">Tahmini satış süresi (kategoriye göre)</div>
+      <div class="svc-item">Tek onayda otomatik fiyat güncelleme</div>
+      <div class="svc-item">24 saatlik fiyat izleme & alert</div>
+    </div>
+    <div class="svc">
+      <div class="svc-icon">🔔</div>
+      <div class="svc-name">PROAKTİF UYARILAR</div>
+      <div class="svc-item">İlan süresi doluyor → "Uzatayım mı?"</div>
+      <div class="svc-item">Yeni mesaj → "Bakayım mı?"</div>
+      <div class="svc-item">Sponsor bitti → "Yenileyelim mi?"</div>
+      <div class="svc-item">Sabah 09:00 + Akşam 20:00 raporu</div>
+      <div class="svc-item">Win-back (14 günlük sessizlik)</div>
+    </div>
+    <div class="svc">
+      <div class="svc-icon">🏆</div>
+      <div class="svc-name">SADAKAT & TAVSİYE</div>
+      <div class="svc-item">6 kademeli rozet (Yeni Üye → Efsane)</div>
+      <div class="svc-item">Aksiyonlarla puan (50–500 puan)</div>
+      <div class="svc-item">Tavsiye kodu + arkadaş ödülü</div>
+      <div class="svc-item">Ödül kataloğu (öne çıkarma, premium)</div>
+      <div class="svc-item">"puanlarım / ödüllerim" komutları</div>
+    </div>
+    <div class="svc">
+      <div class="svc-icon">🧠</div>
+      <div class="svc-name">ZEKA & ANALİTİK</div>
+      <div class="svc-item">Lead skoru (0–100, cold/warm/hot)</div>
+      <div class="svc-item">Duygu analizi (sentiment engine)</div>
+      <div class="svc-item">A/B test motoru (mesaj varyantları)</div>
+      <div class="svc-item">Kullanıcı segmentasyonu</div>
+      <div class="svc-item">Churn önleme sistemi</div>
+    </div>
+    <div class="svc">
+      <div class="svc-icon">🗺️</div>
+      <div class="svc-name">EMLAK ARAÇLARI</div>
+      <div class="svc-item">Kredi & mortgage hesaplayıcı</div>
+      <div class="svc-item">Müzakere motoru</div>
+      <div class="svc-item">Piyasa zekası (market intelligence)</div>
+      <div class="svc-item">Ofis analitiği</div>
+      <div class="svc-item">Ödeme link üretici</div>
+    </div>
+    <div class="svc">
+      <div class="svc-icon">⚡</div>
+      <div class="svc-name">PERFORMANS</div>
+      <div class="svc-item">Cache (1000 yanıt, 1 saat TTL)</div>
+      <div class="svc-item">Otomatik model seçimi (GPT-3.5/4/4o)</div>
+      <div class="svc-item">Token & maliyet takibi</div>
+      <div class="svc-item">Quality Validator (hallucination önleme)</div>
+      <div class="svc-item">Error recovery + fallback</div>
+    </div>
+    <div class="svc">
+      <div class="svc-icon">📡</div>
+      <div class="svc-name">İLETİŞİM</div>
+      <div class="svc-item">Toplu broadcast kampanyaları</div>
+      <div class="svc-item">Akıllı takip mesajları</div>
+      <div class="svc-item">Ses mesajı işleme</div>
+      <div class="svc-item">Zengin medya gönderimi</div>
+      <div class="svc-item">Çok hesap yönetimi</div>
+    </div>
+    <div class="svc">
+      <div class="svc-icon">🛡️</div>
+      <div class="svc-name">PROBLEM YÖNETİMİ</div>
+      <div class="svc-item">9 kategorili otomatik yönlendirme</div>
+      <div class="svc-item">9 özel handler (hesap, ödeme, teknik…)</div>
+      <div class="svc-item">İnsan aktarımı (fraud, şikayet, 3 hata)</div>
+      <div class="svc-item">Admin anlık bildirim</div>
+      <div class="svc-item">Konuşma hafıza & bağlam yönetimi</div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════ STAR FEATURES ═══════════════ -->
+<section class="section section-dark">
+  <div class="section-label">Gerçek Çıktılar</div>
+  <h2 class="section-title">Test edildi.<br><span style="color: var(--gold)">Geçti.</span></h2>
+
+  <div class="cap-grid">
+    <div class="cap-item">
+      <div class="cap-number">01</div>
+      <div class="cap-title">FİYAT KOÇU</div>
+      <div class="cap-desc">"fiyat analizi yap" yaz — 12+ rakip ilanı tara, medyan/min/max hesapla, tahmini satış süresi ver, fiyat öner, onay alırsa otomatik güncelle.</div>
+      <div class="term">
+<span class="tm">📊 Fiyat Analizi — iPhone 14 Pro 256GB</span><br>
+<span class="tm">──────────────────────────────</span><br>
+<span class="tm">Piyasa (12 ilan):</span><br>
+<span class="tm">  min: </span><span class="tw">58.000 TL</span><span class="tm">  medyan: </span><span class="tw">71.000 TL</span><br>
+<span class="tm">  Senin: </span><span class="to">82.000 TL</span><span class="tm"> 🔴 +%15</span><br>
+<span class="tm">──────────────────────────────</span><br>
+<span class="tb">🎯 Öneri: 67.450 TL</span><br>
+<span class="tc">⏱ 49 gün → ~16 güne inebilir</span><br>
+<span class="tm">Güncelleyeyim mi? evet / hayır</span>
+      </div>
+    </div>
+
+    <div class="cap-item">
+      <div class="cap-number">02</div>
+      <div class="cap-title">FOTOĞRAFTAN İLAN</div>
+      <div class="cap-desc">Kullanıcı fotoğraf atar → AI kategori, marka, model, durum, renk çıkarır → piyasa fiyatı tahmin eder → eksik alanları sorar → ilan açılır.</div>
+      <div class="term">
+<span class="tc">📸 Fotoğraf analiz edildi ✅</span><br>
+<span class="tm">──────────────────────────────</span><br>
+<span class="tm">Ürün:    </span><span class="tw">iPhone 14 Pro 256GB</span><br>
+<span class="tm">Durum:   </span><span class="tw">Az kullanılmış</span><br>
+<span class="tm">Piyasa:  </span><span class="tb">52.000 – 70.000 TL</span><br>
+<span class="tm">──────────────────────────────</span><br>
+<span class="tc">✅ 6 alan otomatik dolduruldu</span><br>
+<span class="tm">📝 2 alan daha gerekiyor</span><br>
+<span class="to">⚠ Fotoğrafta yüz tespit edildi</span>
+      </div>
+    </div>
+
+    <div class="cap-item">
+      <div class="cap-number">03</div>
+      <div class="cap-title">DOĞRULUK KALKANI</div>
+      <div class="cap-desc">Quality Validator her cevabı gerçek zamanlı denetler. Platform bilgileri, URL'ler, iş modeli — hiçbir şey uydurulmaz. Tüm 13 senaryo geçti.</div>
+      <div class="term">
+<span class="tc">✅ Doğruluk Kalkanı — Test Sonuçları</span><br>
+<span class="tm">──────────────────────────────</span><br>
+<span class="tm">Senaryolar:        </span><span class="tw">13/13 ✓</span><br>
+<span class="tm">Kritik kural (YETKİ): </span><span class="tc">✓</span><br>
+<span class="tm">Tel (+90 501 048): </span><span class="tc">✓</span><br>
+<span class="tm">URL haritası:      </span><span class="tc">15/15 ✓</span><br>
+<span class="tm">──────────────────────────────</span><br>
+<span class="tc">ILO doğruluk kalkanı aktif ✅</span>
+      </div>
+    </div>
+
+    <div class="cap-item">
+      <div class="cap-number">04</div>
+      <div class="cap-title">PROAKTİF UYARILAR</div>
+      <div class="cap-desc">Scheduler: Saatlik ilan kontrolü, 6 saatte mesaj uyarısı, 09:00 sabah raporu, 20:00 akşam özeti. Cooldown sistemi spam'i engeller.</div>
+      <div class="term">
+<span class="tm">🔔 Scheduler Takvimi</span><br>
+<span class="tm">──────────────────────────────</span><br>
+<span class="tw">Her saat:  </span><span class="tm">ilan/sponsor kontrolü</span><br>
+<span class="tw">6 saatte:  </span><span class="tm">okunmamış mesaj</span><br>
+<span class="tc">09:00:     sabah raporu</span><br>
+<span class="tb">20:00:     akşam özeti</span><br>
+<span class="tm">──────────────────────────────</span><br>
+<span class="tm">Win-back:  </span><span class="tw">14 günlük sessizlik</span><br>
+<span class="tm">Cooldown:  </span><span class="tw">6–48 saat (tür bazlı)</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════ PROBLEM ROUTER ═══════════════ -->
+<section class="section">
+  <div class="section-label">Problem Yönetimi</div>
+  <h2 class="section-title">Hiçbir soru<br><span style="color: var(--gold)">cevapsız kalmaz.</span></h2>
+
+  <div class="flow">
+    <div class="flow-step">
+      <div class="f-icon">💬</div>
+      <div class="f-title">MESAJ</div>
+      <div class="f-sub">WhatsApp'tan gelen her mesaj</div>
+    </div>
+    <div class="flow-step">
+      <div class="f-icon">🧠</div>
+      <div class="f-title">KATEGORİZE</div>
+      <div class="f-sub">9 kategori, güven skoru, aciliyet</div>
+    </div>
+    <div class="flow-step">
+      <div class="f-icon">⚡</div>
+      <div class="f-title">HANDLER</div>
+      <div class="f-sub">9 özel handler — hassas yanıt</div>
+    </div>
+    <div class="flow-step">
+      <div class="f-icon">✅</div>
+      <div class="f-title">DOĞRULAMA</div>
+      <div class="f-sub">Cevap fact-check'ten geçer</div>
+    </div>
+    <div class="flow-step">
+      <div class="f-icon">🤝</div>
+      <div class="f-title">YANIT / İNSAN</div>
+      <div class="f-sub">Gerekirse insan aktarımı</div>
+    </div>
+  </div>
+
+  <div class="cat-grid">
+    <div class="cat"><div class="cdot"></div>Hesap & Giriş</div>
+    <div class="cat"><div class="cdot"></div>İlan Oluşturma</div>
+    <div class="cat"><div class="cdot"></div>İlan Yönetimi</div>
+    <div class="cat"><div class="cdot"></div>Ödeme & Fatura</div>
+    <div class="cat"><div class="cdot"></div>Teknik Sorun</div>
+    <div class="cat"><div class="cdot"></div>Dolandırıcılık & Güvenlik</div>
+    <div class="cat"><div class="cdot"></div>Paket Yönetimi</div>
+    <div class="cat"><div class="cdot"></div>Genel Bilgi</div>
+    <div class="cat"><div class="cdot"></div>Şikayet</div>
+  </div>
+</section>
+
+<!-- ═══════════════ KULLANICI TİPLERİ ═══════════════ -->
+<section class="section section-alt">
+  <div class="section-label">Kullanım Senaryoları</div>
+  <h2 class="section-title">Her kullanıcı tipi<br><span style="color: var(--gold)">için ayrı dil.</span></h2>
+
+  <div class="usecase-list">
+    <div class="usecase-row">
+      <div class="usecase-who">MÜK SAHİBİ</div>
+      <div class="usecase-cell">
+        <div class="u-pain">"İlanımı nasıl açacağım? Hangi ofisi seçeceğim? Fiyat koysam mı?"</div>
+        <div class="u-sol">Fotoğraf at → ilan oluşsun. Fiyat sor → piyasa analizi gelsin. <strong>Yetki zorunluluğunu doğru ve olumlu çerçevede</strong> anlatır. Adım adım rehberlik.</div>
+      </div>
+    </div>
+    <div class="usecase-row">
+      <div class="usecase-who">EMLAK OFİSİ</div>
+      <div class="usecase-cell">
+        <div class="u-pain">"Sponsorlu ofis ne kazandırır? Çözüm Ortaklığı nasıl çalışır?"</div>
+        <div class="u-sol">Profesyonel ton, rakamlar ve avantajlarla konuşur. <strong>Uluslararası alıcı ağı</strong> avantajlarını net verir. Sponsorlu ofis başvurusu yönlendirmesi.</div>
+      </div>
+    </div>
+    <div class="usecase-row">
+      <div class="usecase-who">ALICI / YATIRIMCI</div>
+      <div class="usecase-cell">
+        <div class="u-pain">"Bu fiyat mantıklı mı? Yabancı olarak alabilir miyim?"</div>
+        <div class="u-sol">Kredi hesaplayıcı, piyasa analizi, Çözüm Ortakları yönlendirmesi. <strong>İngilizce, Rusça, Danca</strong> destek. Hızlı ve net cevap.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════ SADAKAT ═══════════════ -->
+<section class="section section-sage">
+  <div class="section-label">Bağlılık Motoru</div>
+  <h2 class="section-title">Kullandıkça kazan.<br><span style="color: var(--gold-light)">Kazandıkça sat.</span></h2>
+
+  <div class="loyalty-grid">
+    <div class="loyalty-side">
+      <div class="section-label" style="margin-bottom: 8px; color: var(--gold-light);">Rozet Sistemi</div>
+      <p style="font-size: 13px; color: rgba(245,240,232,0.8); margin-bottom: 4px;">6 kademe · puan bazlı · otomatik yükseltme</p>
+      <table class="badge-table">
+        <tr><td>🌱</td><td class="bn">Yeni Üye</td><td class="bp">0 puan</td><td class="bperk">Hoş geldin</td></tr>
+        <tr><td>⭐</td><td class="bn">Aktif Üye</td><td class="bp">200+</td><td class="bperk">+10% görünürlük</td></tr>
+        <tr><td>✅</td><td class="bn">Güvenilir</td><td class="bp">500+</td><td class="bperk">Güven rozeti</td></tr>
+        <tr class="active-row"><td>🏆</td><td class="bn">Uzman</td><td class="bp">1.000+</td><td class="bperk">+25% · öne çıkarma</td></tr>
+        <tr><td>💎</td><td class="bn">Efsane</td><td class="bp">2.500+</td><td class="bperk">+50% · sınırsız</td></tr>
+        <tr><td>🦁</td><td class="bn">Marka Elçisi</td><td class="bp">5.000+</td><td class="bperk">Premium ücretsiz</td></tr>
+      </table>
+    </div>
+
+    <div class="loyalty-side">
+      <div class="section-label" style="margin-bottom: 8px; color: var(--gold-light);">Puan Kazanma</div>
+      <p style="font-size: 13px; color: rgba(245,240,232,0.8); margin-bottom: 16px;">Her aksiyonla puan · puan ile ödül</p>
+      <div class="point-table">
+        <div class="pt-row"><span class="pt-name">📋 İlan açma</span><span class="pt-pts">+50 <span class="pt-unit">puan</span></span></div>
+        <div class="pt-row"><span class="pt-name">⭐ Değerlendirme</span><span class="pt-pts">+100 <span class="pt-unit">puan</span></span></div>
+        <div class="pt-row"><span class="pt-name">🔗 Tavsiye (kayıt)</span><span class="pt-pts">+300 <span class="pt-unit">puan</span></span></div>
+        <div class="pt-row"><span class="pt-name">💎 Premium / ay</span><span class="pt-pts">+200 <span class="pt-unit">puan</span></span></div>
+        <div class="pt-row"><span class="pt-name">🏠 İlan satışı</span><span class="pt-pts">+500 <span class="pt-unit">puan</span></span></div>
+      </div>
+      <p style="font-size: 11px; color: rgba(245,240,232,0.7); margin-top: 14px;">Ödüller: Öne çıkarma · Premium 1 ay · %20–50 sponsor indirimi · İlan uzatma</p>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════ KARŞILAŞTIRMA ═══════════════ -->
+<section class="section">
+  <div class="section-label">Rekabet</div>
+  <h2 class="section-title">Neden klasik chatbot<br><span style="color: var(--gold)">yetmez?</span></h2>
+
+  <div class="compare-wrap">
+    <table class="cmp">
+      <thead>
+        <tr>
+          <th>Özellik</th>
+          <th class="hl">ILO (ilanpa)</th>
+          <th>Standart Chatbot</th>
+          <th>Canlı Destek</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td>7/24 kesintisiz</td><td class="hl"><span class="ck">✓</span></td><td><span class="ck">✓</span></td><td><span class="cx">✗</span></td></tr>
+        <tr><td>Fotoğraftan ilan oluşturma</td><td class="hl"><span class="ck">✓</span></td><td><span class="cx">✗</span></td><td><span class="cx">✗</span></td></tr>
+        <tr><td>Gerçek zamanlı fiyat analizi</td><td class="hl"><span class="ck">✓</span></td><td><span class="cx">✗</span></td><td><span class="cp">kısmi</span></td></tr>
+        <tr><td>Proaktif kullanıcı uyarıları</td><td class="hl"><span class="ck">✓</span></td><td><span class="cx">✗</span></td><td><span class="cx">✗</span></td></tr>
+        <tr><td>Doğruluk kalkanı</td><td class="hl"><span class="ck">✓</span></td><td><span class="cx">✗</span></td><td><span class="ck">✓</span></td></tr>
+        <tr><td>Lead skorlama (0–100)</td><td class="hl"><span class="ck">✓</span></td><td><span class="cx">✗</span></td><td><span class="cx">✗</span></td></tr>
+        <tr><td>Sadakat & tavsiye sistemi</td><td class="hl"><span class="ck">✓</span></td><td><span class="cx">✗</span></td><td><span class="cx">✗</span></td></tr>
+        <tr><td>A/B test & analitik</td><td class="hl"><span class="ck">✓</span></td><td><span class="cx">✗</span></td><td><span class="cx">✗</span></td></tr>
+        <tr><td>Çok dilli (TR/EN/RU/DA)</td><td class="hl"><span class="ck">✓</span></td><td><span class="cp">kısmi</span></td><td><span class="cp">kısmi</span></td></tr>
+        <tr><td>Akıllı insan aktarımı</td><td class="hl"><span class="ck">✓</span></td><td><span class="cp">kısmi</span></td><td><span class="ck">✓</span></td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<!-- ═══════════════ DOĞRULUK KALKANI ═══════════════ -->
+<section class="section section-alt">
+  <div class="section-label">Güven Altyapısı</div>
+  <h2 class="section-title">Yanlış bilgi<br><span style="color: var(--gold)">verilmez. Hiç.</span></h2>
+
+  <div class="truth-grid">
+    <div class="truth-side">
+      <div class="section-label" style="margin-bottom: 20px;">13 Senaryo — Hepsi Geçti</div>
+      <div class="scenario">
+        <div class="s-q">Kullanıcı: "ilanpa sahibinden.com gibi mi?"</div>
+        <div class="s-wrong">"Evet, benzer bir platform"</div>
+        <div class="s-right">ilanpa'da mutlaka bir emlak ofisi aracılığıyla çalışılır — bu güvenliği sağlar.</div>
+      </div>
+      <div class="scenario">
+        <div class="s-q">Kullanıcı: "Komisyon oranı nedir?"</div>
+        <div class="s-wrong">"X% komisyon ödenir"</div>
+        <div class="s-right">Komisyon siz ve ofis arasında belirlenir — ilanpa bu süreçte taraf değil.</div>
+      </div>
+      <div class="scenario">
+        <div class="s-q">Kullanıcı: "Şifrem çalışmıyor"</div>
+        <div class="s-wrong">"Bize ulaşın" (genel yönlendirme)</div>
+        <div class="s-right">ilanpa.com/bireysel/giris → "Şifremi Unuttum" ile sıfırlayın.</div>
+      </div>
+      <div class="scenario">
+        <div class="s-q">Kullanıcı: "Yabancıya satabilir miyim?"</div>
+        <div class="s-wrong">"Süreç nasıl bilmiyorum"</div>
+        <div class="s-right">Evet! İngilizce, Rusça, Danca bilen Çözüm Ortakları mevcut.</div>
+      </div>
+      <div class="scenario">
+        <div class="s-q">Kullanıcı: "Hangi ofisi seçmeliyim?"</div>
+        <div class="s-wrong">Belirli bir ofis önermek</div>
+        <div class="s-right">ilanpa.com/cozum-ortaklari'dan bölgeye ve dile göre filtreleyin.</div>
+      </div>
+    </div>
+
+    <div class="truth-stats">
+      <div class="t-stat">
+        <div class="ts-num">13</div>
+        <div class="ts-text">Önceden tespit edilmiş hata senaryosu. Her biri için doğru cevap sisteme kodlanmış. Tüm testler geçti ✅</div>
+      </div>
+      <div class="t-stat">
+        <div class="ts-num">0</div>
+        <div class="ts-text">Uydurulmuş bilgi. Emin olmadığı her konuda direkt iletişim: +90 501 048 07 38 | info@ilanpa.com</div>
+      </div>
+      <div class="t-stat">
+        <div class="ts-num">15</div>
+        <div class="ts-text">Tam URL haritası. Anasayfa'dan KVKK'ya, bireysel kayıttan ofis girişine — her link doğru ve güncel.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════ TECH STACK ═══════════════ -->
+<section class="tech-wrap">
+  <div class="section-label">Teknik Mimari</div>
+  <h2 class="section-title">Ciddiye alınmış<br><span style="color: var(--gold)">bir sistem.</span></h2>
+  <div class="tech-pills">
+    <span class="tp core">WhatsApp Business API</span>
+    <span class="tp core">GPT-4o Vision</span>
+    <span class="tp core">GPT-4 Turbo</span>
+    <span class="tp core">Node.js</span>
+    <span class="tp">AI Orchestrator</span>
+    <span class="tp">Sentiment Engine</span>
+    <span class="tp">Quality Validator</span>
+    <span class="tp">A/B Test Engine</span>
+    <span class="tp">Proactive Scheduler</span>
+    <span class="tp">Lead Intelligence</span>
+    <span class="tp">Context Memory</span>
+    <span class="tp">Performance Optimizer</span>
+    <span class="tp">Response Cache</span>
+    <span class="tp">Error Recovery</span>
+    <span class="tp">Multi-Account Manager</span>
+    <span class="tp">ilanpa REST API</span>
+    <span class="tp">Broadcast Campaign</span>
+    <span class="tp">Churn Prevention</span>
+    <span class="tp">Negotiation Engine</span>
+    <span class="tp">Mortgage Calculator</span>
+  </div>
+</section>
+
+<!-- ═══════════════ CTA ═══════════════ -->
+<section class="cta-section">
+  <div class="cta-label">ilanpa.com · WhatsApp AI Agent · ILO</div>
+  <h2>
+    <span class="a1">ILO</span> HAZIR.<br>
+    <span class="a2">LANSMAN</span> YAKLAŞIYOR.
+  </h2>
+  <p class="cta-sub">
+    50+ servis, 7/24 çalışma, doğruluk kalkanı, fiyat koçu, fotoğraftan ilan — hepsi tek WhatsApp numarasında.
+  </p>
+
+  <div class="cta-btns">
+    <a href="https://ilanpa.com/bireysel/kayit" class="btn-p">Ücretsiz Kayıt Ol</a>
+    <a href="https://ilanpa.com/ofis/sponsorlu-ofis" class="btn-s">Ofis Başvurusu</a>
+  </div>
+
+  <div class="contact-row">
+    <div class="ci">📞 <span>+90 501 048 07 38</span></div>
+    <div class="ci">✉️ <span>info@ilanpa.com</span></div>
+    <div class="ci">🌐 <span>ilanpa.com</span></div>
+    <div class="ci">📍 <span>Alanya · Antalya · ETBİB Kayıtlı</span></div>
+  </div>
+</section>
+
+<!-- ═══════════════ FOOTER ═══════════════ -->
+<footer>
+  <div class="f-logo">ilanpa<span>.com</span> <em>· ILO AI Agent</em></div>
+  <div>Gayrimenkul Bağlantı Platformu · Alanya / Antalya · 2026</div>
+  <div>50+ Servis · 7/24 · Node.js + GPT-4o</div>
+</footer>
+
+</body>
+</html>
