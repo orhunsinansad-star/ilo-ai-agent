@@ -1,0 +1,1902 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dijital Çalışan — AI Agent Sistemleri</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400;1,700&family=DM+Mono:wght@300;400;500&family=Figtree:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+/* ─── TOKENS ────────────────────────────────────────── */
+:root {
+  --ink:      #060408;
+  --ink2:     #0c080f;
+  --ink3:     #110c16;
+  --cream:    #f5f0e8;
+  --cream2:   #ede8e0;
+  --violet:   #7c3aed;
+  --violet-l: #a78bfa;
+  --mag:      #d946ef;
+  --amber:    #f59e0b;
+  --rose:     #f43f5e;
+  --border:   rgba(124,58,237,0.2);
+  --text:     #c8b8d8;
+  --muted:    #5a4a6a;
+  --white:    #f0e8ff;
+}
+
+*{margin:0;padding:0;box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+
+body {
+  background: var(--ink);
+  color: var(--text);
+  font-family: 'Figtree', sans-serif;
+  font-weight: 300;
+  overflow-x: hidden;
+}
+
+/* Grain */
+body::before {
+  content:'';
+  position:fixed;
+  inset:0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.025'/%3E%3C/svg%3E");
+  pointer-events:none;
+  z-index:0;
+}
+
+/* ─── COVER ─────────────────────────────────────────── */
+.cover {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 0 9vw;
+  position: relative;
+  overflow: hidden;
+  border-bottom: 1px solid var(--border);
+}
+
+.cover-line {
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, var(--violet), var(--mag), var(--amber));
+}
+
+/* Diagonal accent */
+.cover::after {
+  content:'';
+  position:absolute;
+  top:-20%; right:-5%;
+  width: 55%;
+  height: 140%;
+  background: linear-gradient(135deg,
+    rgba(124,58,237,0.06) 0%,
+    rgba(217,70,239,0.04) 50%,
+    transparent 100%);
+  transform: skewX(-8deg);
+  pointer-events:none;
+}
+
+.cover-eyebrow {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 60px;
+  position: relative;
+  z-index: 1;
+}
+
+.dot-live {
+  width: 7px; height: 7px;
+  border-radius: 50%;
+  background: var(--mag);
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse{0%,100%{box-shadow:0 0 0 0 rgba(217,70,239,0.4);}50%{box-shadow:0 0 0 6px rgba(217,70,239,0);}}
+
+.eyebrow-text {
+  font-family: 'DM Mono', monospace;
+  font-size: 11px;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.cover h1 {
+  font-family: 'Playfair Display', serif;
+  font-size: clamp(56px, 8vw, 120px);
+  font-weight: 900;
+  line-height: 0.95;
+  letter-spacing: -3px;
+  color: var(--cream);
+  position: relative;
+  z-index: 1;
+  max-width: 900px;
+}
+
+.cover h1 em {
+  font-style: italic;
+  color: transparent;
+  -webkit-text-stroke: 1.5px var(--violet-l);
+}
+
+.cover h1 .mag { color: var(--mag); font-style: italic; -webkit-text-stroke: 0; }
+
+.cover-sub {
+  margin-top: 40px;
+  font-size: 18px;
+  color: var(--muted);
+  max-width: 540px;
+  line-height: 1.9;
+  position: relative;
+  z-index: 1;
+}
+
+.cover-sub strong { color: var(--text); font-weight: 500; }
+
+/* Big number strip */
+.stat-strip {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 0;
+  margin-top: 80px;
+  border-top: 1px solid var(--border);
+  border-left: 1px solid var(--border);
+  position: relative;
+  z-index: 1;
+}
+
+.stat-box {
+  border-right: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+  padding: 32px 28px;
+  position: relative;
+  overflow: hidden;
+}
+
+.stat-box::before {
+  content: '';
+  position: absolute;
+  bottom: 0; left: 0;
+  width: 100%;
+  height: 2px;
+  background: linear-gradient(90deg, var(--violet), transparent);
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+
+.stat-box:hover::before { opacity: 1; }
+
+.stat-n {
+  font-family: 'Playfair Display', serif;
+  font-size: 52px;
+  font-weight: 900;
+  color: var(--cream);
+  line-height: 1;
+  letter-spacing: -2px;
+}
+
+.stat-n .unit { font-size: 28px; color: var(--violet-l); }
+
+.stat-label {
+  font-size: 11px;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  margin-top: 10px;
+  line-height: 1.5;
+  font-family: 'DM Mono', monospace;
+}
+
+/* ─── SECTION ─────────────────────────────────────── */
+.sec {
+  padding: 100px 9vw;
+  position: relative;
+  z-index: 1;
+}
+
+.sec-alt { background: var(--ink2); border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); }
+.sec-alt2 { background: var(--ink3); }
+
+.s-label {
+  font-family: 'DM Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 3.5px;
+  text-transform: uppercase;
+  color: var(--violet-l);
+  margin-bottom: 20px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.s-label::before {
+  content: '';
+  width: 24px;
+  height: 1px;
+  background: var(--violet);
+}
+
+.s-title {
+  font-family: 'Playfair Display', serif;
+  font-size: clamp(36px, 4.5vw, 64px);
+  font-weight: 900;
+  color: var(--cream);
+  line-height: 1.05;
+  letter-spacing: -1.5px;
+  max-width: 740px;
+}
+
+.s-title em { font-style: italic; color: var(--mag); }
+.s-title .v { color: var(--violet-l); }
+
+.s-body {
+  font-size: 15px;
+  color: var(--muted);
+  line-height: 1.9;
+  max-width: 640px;
+  margin-top: 24px;
+}
+
+/* ─── THE PROBLEM ──────────────────────────────────── */
+.problem-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1px;
+  background: var(--border);
+  margin-top: 60px;
+}
+
+.prob-item {
+  background: var(--ink);
+  padding: 40px 36px;
+  position: relative;
+  transition: background 0.2s;
+}
+
+.prob-item:hover { background: #0d0812; }
+
+.prob-num {
+  font-family: 'Playfair Display', serif;
+  font-size: 72px;
+  font-weight: 900;
+  color: transparent;
+  -webkit-text-stroke: 1px rgba(124,58,237,0.2);
+  line-height: 1;
+  position: absolute;
+  top: 20px; right: 24px;
+  letter-spacing: -3px;
+}
+
+.prob-title {
+  font-family: 'Playfair Display', serif;
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--cream);
+  margin-bottom: 14px;
+  position: relative;
+}
+
+.prob-desc { font-size: 13.5px; color: var(--muted); line-height: 1.8; }
+.prob-desc strong { color: var(--rose); font-weight: 500; }
+
+.prob-stat {
+  margin-top: 20px;
+  padding: 14px 16px;
+  background: rgba(244,63,94,0.06);
+  border-left: 2px solid var(--rose);
+  font-family: 'DM Mono', monospace;
+  font-size: 12px;
+  color: var(--rose);
+}
+
+/* ─── DIGITAL WORKER ───────────────────────────────── */
+.dw-layout {
+  display: grid;
+  grid-template-columns: 1fr 1.4fr;
+  gap: 80px;
+  align-items: start;
+  margin-top: 60px;
+}
+
+.dw-left {}
+
+.dw-claim {
+  font-family: 'Playfair Display', serif;
+  font-size: clamp(28px, 3.5vw, 48px);
+  font-weight: 700;
+  color: var(--cream);
+  line-height: 1.1;
+  letter-spacing: -1px;
+  margin-bottom: 28px;
+}
+
+.dw-claim em { font-style: italic; color: var(--mag); }
+
+.vs-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 20px;
+}
+
+.vs-table tr { border-bottom: 1px solid var(--border); }
+.vs-table tr:last-child { border-bottom: none; }
+.vs-table tr:hover td { background: rgba(124,58,237,0.03); }
+
+.vs-table td {
+  padding: 14px 8px;
+  font-size: 13px;
+  vertical-align: middle;
+}
+
+.vs-attr { color: var(--muted); font-family: 'DM Mono', monospace; font-size: 11px; letter-spacing: 0.5px; }
+.vs-human { color: var(--rose); text-align: center; }
+.vs-ai { color: #22c55e; text-align: center; font-weight: 500; }
+.vs-head { font-size: 10px; color: var(--muted); text-align: center; text-transform: uppercase; letter-spacing: 1.5px; padding-bottom: 16px; font-family: 'DM Mono', monospace; border-bottom: 1px solid var(--border); }
+
+.dw-right {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.cap-item {
+  display: flex;
+  gap: 16px;
+  align-items: flex-start;
+  padding: 20px 22px;
+  border: 1px solid var(--border);
+  background: var(--ink2);
+  transition: all 0.2s;
+  position: relative;
+  overflow: hidden;
+}
+
+.cap-item::before {
+  content: '';
+  position: absolute;
+  left: 0; top: 0; bottom: 0;
+  width: 2px;
+  background: var(--violet);
+  transform: scaleY(0);
+  transition: transform 0.2s;
+  transform-origin: bottom;
+}
+
+.cap-item:hover { border-color: rgba(124,58,237,0.4); }
+.cap-item:hover::before { transform: scaleY(1); }
+
+.cap-icon { font-size: 20px; flex-shrink: 0; margin-top: 2px; }
+.cap-title { font-size: 14px; font-weight: 600; color: var(--white); margin-bottom: 4px; }
+.cap-text { font-size: 12.5px; color: var(--muted); line-height: 1.7; }
+
+/* ─── INDUSTRIES ───────────────────────────────────── */
+.industries-intro {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 60px;
+  align-items: end;
+  margin-bottom: 60px;
+}
+
+.ind-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1px;
+  background: var(--border);
+}
+
+.ind-card {
+  background: var(--ink);
+  padding: 0;
+  overflow: hidden;
+  cursor: default;
+  transition: background 0.2s;
+}
+
+.ind-card:hover { background: var(--ink2); }
+
+.ind-header {
+  padding: 28px 24px 20px;
+  border-bottom: 1px solid var(--border);
+  position: relative;
+}
+
+.ind-header::after {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, var(--violet), var(--mag), transparent);
+  opacity: 0;
+  transition: opacity 0.2s;
+}
+
+.ind-card:hover .ind-header::after { opacity: 1; }
+
+.ind-icon { font-size: 28px; margin-bottom: 12px; }
+.ind-name {
+  font-family: 'Playfair Display', serif;
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--cream);
+}
+
+.ind-tag {
+  font-size: 10px;
+  color: var(--violet-l);
+  font-family: 'DM Mono', monospace;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  margin-top: 4px;
+}
+
+.ind-body { padding: 20px 24px; }
+
+.ind-pain {
+  font-size: 12px;
+  color: var(--rose);
+  font-style: italic;
+  margin-bottom: 14px;
+  padding: 10px 12px;
+  background: rgba(244,63,94,0.05);
+  border-left: 2px solid var(--rose);
+  line-height: 1.6;
+}
+
+.ind-sol {
+  font-size: 12.5px;
+  color: var(--muted);
+  line-height: 1.8;
+  margin-bottom: 14px;
+}
+
+.ind-sol strong { color: var(--cream2); font-weight: 500; }
+
+.ind-wins {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.ind-win {
+  font-size: 11.5px;
+  color: #22c55e;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-family: 'DM Mono', monospace;
+}
+
+.ind-win::before { content: '↑'; font-weight: 700; }
+
+/* ─── ROI SECTION ──────────────────────────────────── */
+.roi-layout {
+  display: grid;
+  grid-template-columns: 1.2fr 1fr;
+  gap: 80px;
+  align-items: start;
+  margin-top: 60px;
+}
+
+.cost-box {
+  border: 1px solid var(--border);
+  overflow: hidden;
+}
+
+.cost-header {
+  padding: 20px 28px;
+  background: rgba(244,63,94,0.06);
+  border-bottom: 1px solid var(--border);
+  font-family: 'DM Mono', monospace;
+  font-size: 11px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--rose);
+}
+
+.cost-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 28px;
+  border-bottom: 1px solid var(--border);
+  transition: background 0.15s;
+}
+
+.cost-row:hover { background: rgba(244,63,94,0.03); }
+.cost-row:last-child { border-bottom: none; }
+.cost-name { font-size: 13px; color: var(--muted); }
+.cost-val { font-family: 'Playfair Display', serif; font-size: 22px; font-weight: 700; color: var(--rose); }
+
+.gain-box {
+  border: 1px solid rgba(34,197,94,0.2);
+  overflow: hidden;
+}
+
+.gain-header {
+  padding: 20px 28px;
+  background: rgba(34,197,94,0.06);
+  border-bottom: 1px solid rgba(34,197,94,0.15);
+  font-family: 'DM Mono', monospace;
+  font-size: 11px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: #22c55e;
+}
+
+.gain-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 28px;
+  border-bottom: 1px solid rgba(34,197,94,0.1);
+}
+
+.gain-row:last-child { border-bottom: none; }
+.gain-name { font-size: 13px; color: var(--muted); }
+.gain-val { font-family: 'Playfair Display', serif; font-size: 22px; font-weight: 700; color: #22c55e; }
+
+.roi-hero {
+  grid-column: 1 / -1;
+  padding: 60px;
+  background: linear-gradient(135deg, rgba(124,58,237,0.1) 0%, rgba(217,70,239,0.06) 100%);
+  border: 1px solid rgba(124,58,237,0.25);
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+}
+
+.roi-hero::before {
+  content: 'ROI';
+  position: absolute;
+  font-family: 'Playfair Display', serif;
+  font-size: 300px;
+  font-weight: 900;
+  color: transparent;
+  -webkit-text-stroke: 1px rgba(124,58,237,0.06);
+  left: 50%; top: 50%;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+  user-select: none;
+}
+
+.roi-num {
+  font-family: 'Playfair Display', serif;
+  font-size: 120px;
+  font-weight: 900;
+  color: var(--cream);
+  line-height: 1;
+  letter-spacing: -5px;
+  position: relative;
+}
+
+.roi-num span { color: var(--mag); }
+.roi-label { font-size: 16px; color: var(--muted); margin-top: 12px; }
+.roi-sub { font-size: 13px; color: rgba(90,74,106,0.8); margin-top: 6px; font-family: 'DM Mono', monospace; }
+
+/* ─── PROOF (ILO) ──────────────────────────────────── */
+.proof-layout {
+  display: grid;
+  grid-template-columns: 1fr 1.6fr;
+  gap: 80px;
+  align-items: center;
+  margin-top: 60px;
+}
+
+.proof-badge {
+  background: linear-gradient(135deg, rgba(124,58,237,0.15) 0%, rgba(217,70,239,0.08) 100%);
+  border: 1px solid rgba(124,58,237,0.3);
+  padding: 48px 40px;
+  text-align: center;
+  position: relative;
+}
+
+.proof-badge::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, var(--violet), var(--mag));
+}
+
+.proof-icon { font-size: 48px; margin-bottom: 20px; }
+.proof-name {
+  font-family: 'Playfair Display', serif;
+  font-size: 36px;
+  font-weight: 900;
+  color: var(--cream);
+  letter-spacing: -1px;
+}
+
+.proof-client {
+  font-size: 12px;
+  color: var(--violet-l);
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  font-family: 'DM Mono', monospace;
+  margin-top: 6px;
+}
+
+.proof-divider {
+  width: 40px;
+  height: 1px;
+  background: var(--border);
+  margin: 24px auto;
+}
+
+.proof-stats-mini {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  text-align: left;
+}
+
+.pm-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 12.5px;
+}
+
+.pm-label { color: var(--muted); }
+.pm-val { color: var(--cream); font-family: 'DM Mono', monospace; font-weight: 500; }
+
+.proof-right {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.feat-row {
+  display: flex;
+  gap: 20px;
+  align-items: flex-start;
+  padding: 22px 24px;
+  border: 1px solid var(--border);
+  background: var(--ink2);
+  transition: border-color 0.2s;
+}
+
+.feat-row:hover { border-color: rgba(124,58,237,0.4); }
+
+.feat-num {
+  font-family: 'DM Mono', monospace;
+  font-size: 11px;
+  color: var(--violet-l);
+  background: rgba(124,58,237,0.08);
+  padding: 4px 8px;
+  flex-shrink: 0;
+  margin-top: 2px;
+  border: 1px solid var(--border);
+}
+
+.feat-title { font-size: 14px; font-weight: 600; color: var(--white); margin-bottom: 5px; }
+.feat-text { font-size: 12.5px; color: var(--muted); line-height: 1.7; }
+
+/* ─── PROCESS ──────────────────────────────────────── */
+.process-grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 0;
+  margin-top: 60px;
+  border: 1px solid var(--border);
+}
+
+.proc-step {
+  padding: 40px 24px;
+  border-right: 1px solid var(--border);
+  position: relative;
+  transition: background 0.2s;
+}
+
+.proc-step:last-child { border-right: none; }
+.proc-step:hover { background: rgba(124,58,237,0.04); }
+
+.proc-arrow {
+  position: absolute;
+  right: -12px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--violet-l);
+  font-size: 16px;
+  z-index: 2;
+  background: var(--ink);
+  padding: 0 4px;
+  transition: color 0.2s;
+}
+
+.proc-step:hover .proc-arrow { color: var(--mag); }
+
+.proc-n {
+  font-family: 'Playfair Display', serif;
+  font-size: 48px;
+  font-weight: 900;
+  color: transparent;
+  -webkit-text-stroke: 1px rgba(124,58,237,0.2);
+  line-height: 1;
+  margin-bottom: 16px;
+}
+
+.proc-title {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--white);
+  margin-bottom: 10px;
+  font-family: 'Figtree', sans-serif;
+}
+
+.proc-text { font-size: 12px; color: var(--muted); line-height: 1.7; }
+
+.proc-time {
+  margin-top: 20px;
+  font-family: 'DM Mono', monospace;
+  font-size: 10px;
+  color: var(--violet-l);
+  letter-spacing: 1px;
+}
+
+/* ─── PACKAGES ─────────────────────────────────────── */
+.pkg-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1px;
+  background: var(--border);
+  margin-top: 60px;
+}
+
+.pkg {
+  background: var(--ink);
+  padding: 0;
+  overflow: hidden;
+  position: relative;
+  transition: background 0.2s;
+}
+
+.pkg:hover { background: var(--ink2); }
+
+.pkg.featured { background: rgba(124,58,237,0.07); }
+.pkg.featured:hover { background: rgba(124,58,237,0.1); }
+
+.pkg-stripe {
+  height: 3px;
+  background: var(--border);
+}
+
+.pkg.featured .pkg-stripe {
+  background: linear-gradient(90deg, var(--violet), var(--mag));
+}
+
+.pkg-body { padding: 40px 36px; }
+
+.pkg-tier {
+  font-family: 'DM Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-bottom: 16px;
+}
+
+.pkg.featured .pkg-tier { color: var(--violet-l); }
+
+.pkg-name {
+  font-family: 'Playfair Display', serif;
+  font-size: 28px;
+  font-weight: 700;
+  color: var(--cream);
+  letter-spacing: -0.5px;
+  margin-bottom: 8px;
+}
+
+.pkg-desc { font-size: 13px; color: var(--muted); line-height: 1.7; margin-bottom: 28px; }
+
+.pkg-price {
+  font-family: 'Playfair Display', serif;
+  font-size: 48px;
+  font-weight: 900;
+  color: var(--cream);
+  line-height: 1;
+  letter-spacing: -2px;
+}
+
+.pkg.featured .pkg-price { color: var(--violet-l); }
+.pkg-price-unit { font-size: 16px; color: var(--muted); font-weight: 400; letter-spacing: 0; }
+
+.pkg-divider { width: 100%; height: 1px; background: var(--border); margin: 28px 0; }
+
+.pkg-features { display: flex; flex-direction: column; gap: 10px; }
+
+.pf {
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+  font-size: 13px;
+  color: var(--muted);
+  line-height: 1.5;
+}
+
+.pf::before { content: '✦'; color: var(--violet-l); font-size: 10px; margin-top: 3px; flex-shrink: 0; }
+.pkg.featured .pf { color: var(--text); }
+.pkg.featured .pf::before { color: var(--mag); }
+
+.pkg-cta {
+  display: block;
+  margin-top: 32px;
+  padding: 14px;
+  text-align: center;
+  border: 1px solid var(--border);
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--muted);
+  text-decoration: none;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  transition: all 0.2s;
+  font-family: 'DM Mono', monospace;
+}
+
+.pkg-cta:hover { border-color: rgba(124,58,237,0.5); color: var(--violet-l); }
+
+.pkg.featured .pkg-cta {
+  background: var(--violet);
+  color: var(--cream);
+  border-color: var(--violet);
+}
+
+.pkg.featured .pkg-cta:hover { background: #6d28d9; }
+
+/* ─── MANIFESTO ──────────────────────────────────────── */
+.manifesto {
+  padding: 120px 9vw;
+  position: relative;
+  z-index: 1;
+  overflow: hidden;
+}
+
+.manifesto::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(ellipse at center, rgba(124,58,237,0.08) 0%, transparent 65%);
+  pointer-events: none;
+}
+
+.manifesto-lines {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+.m-line {
+  font-family: 'Playfair Display', serif;
+  font-size: clamp(28px, 4vw, 52px);
+  font-weight: 900;
+  color: rgba(245,240,232,0.08);
+  line-height: 1.1;
+  letter-spacing: -1.5px;
+  padding: 20px 0;
+  border-bottom: 1px solid rgba(124,58,237,0.08);
+  transition: color 0.3s;
+  cursor: default;
+}
+
+.m-line:hover { color: var(--cream); }
+.m-line em { font-style: italic; color: var(--mag); opacity: 1; }
+.m-line.active { color: var(--cream2); }
+.m-line.active em { color: var(--mag); }
+
+/* ─── CTA FINAL ──────────────────────────────────────── */
+.final-cta {
+  padding: 120px 9vw;
+  position: relative;
+  z-index: 1;
+  border-top: 1px solid var(--border);
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 80px;
+  align-items: center;
+}
+
+.final-cta::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, var(--violet), var(--mag), var(--amber));
+}
+
+.cta-left h2 {
+  font-family: 'Playfair Display', serif;
+  font-size: clamp(40px, 5vw, 72px);
+  font-weight: 900;
+  color: var(--cream);
+  line-height: 1.05;
+  letter-spacing: -2px;
+}
+
+.cta-left h2 em { font-style: italic; color: var(--mag); }
+
+.cta-left p {
+  font-size: 15px;
+  color: var(--muted);
+  margin-top: 24px;
+  line-height: 1.8;
+  max-width: 440px;
+}
+
+.cta-right {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.cta-btn-p {
+  background: linear-gradient(135deg, var(--violet), #6d28d9);
+  color: var(--cream);
+  font-family: 'DM Mono', monospace;
+  font-size: 12px;
+  padding: 20px 36px;
+  border: none;
+  cursor: pointer;
+  letter-spacing: 2px;
+  text-decoration: none;
+  display: block;
+  transition: all 0.2s;
+  text-transform: uppercase;
+  text-align: center;
+  box-shadow: 0 0 40px rgba(124,58,237,0.3);
+}
+
+.cta-btn-p:hover { transform: translateY(-2px); box-shadow: 0 8px 50px rgba(124,58,237,0.5); }
+
+.cta-btn-s {
+  background: transparent;
+  color: var(--violet-l);
+  font-family: 'DM Mono', monospace;
+  font-size: 12px;
+  padding: 20px 36px;
+  border: 1px solid rgba(124,58,237,0.3);
+  cursor: pointer;
+  letter-spacing: 2px;
+  text-decoration: none;
+  display: block;
+  transition: all 0.2s;
+  text-transform: uppercase;
+  text-align: center;
+}
+
+.cta-btn-s:hover { border-color: var(--mag); color: var(--mag); }
+
+.contact-info {
+  margin-top: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.ci {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 12.5px;
+  color: var(--muted);
+  font-family: 'DM Mono', monospace;
+}
+
+.ci strong { color: var(--text); }
+
+/* ─── FOOTER ────────────────────────────────────────── */
+footer {
+  background: #030206;
+  padding: 32px 9vw;
+  border-top: 1px solid var(--border);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+  position: relative;
+  z-index: 1;
+}
+
+.f-logo {
+  font-family: 'Playfair Display', serif;
+  font-size: 18px;
+  font-weight: 900;
+  color: var(--cream);
+  letter-spacing: -0.5px;
+}
+
+.f-logo span { color: var(--mag); font-style: italic; }
+
+.f-copy { font-size: 11px; color: var(--muted); font-family: 'DM Mono', monospace; letter-spacing: 1px; }
+
+/* ─── QUOTE ─────────────────────────────────────────── */
+.pullquote {
+  padding: 80px 9vw;
+  position: relative;
+  z-index: 1;
+  overflow: hidden;
+}
+
+.pullquote::before {
+  content: '"';
+  position: absolute;
+  font-family: 'Playfair Display', serif;
+  font-size: 400px;
+  font-weight: 900;
+  color: rgba(124,58,237,0.04);
+  top: -60px; left: 8vw;
+  line-height: 1;
+  pointer-events: none;
+  user-select: none;
+}
+
+blockquote {
+  font-family: 'Playfair Display', serif;
+  font-size: clamp(22px, 3vw, 40px);
+  font-style: italic;
+  color: var(--cream2);
+  line-height: 1.4;
+  max-width: 800px;
+  position: relative;
+  padding-left: 32px;
+  border-left: 3px solid var(--mag);
+  letter-spacing: -0.5px;
+}
+
+blockquote em { color: var(--mag); font-style: normal; }
+
+blockquote cite {
+  display: block;
+  font-family: 'DM Mono', monospace;
+  font-style: normal;
+  font-size: 11px;
+  color: var(--muted);
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  margin-top: 24px;
+}
+
+/* ─── WHATSAPP SECTION ──────────────────────────────── */
+.wa-section {
+  display: grid;
+  grid-template-columns: 1fr 2fr;
+  gap: 0;
+}
+
+.wa-number {
+  background: rgba(34,197,94,0.05);
+  border-right: 1px solid rgba(34,197,94,0.15);
+  padding: 80px 9vw;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+}
+
+.wa-big {
+  font-family: 'Playfair Display', serif;
+  font-size: 100px;
+  font-weight: 900;
+  color: #22c55e;
+  line-height: 1;
+  letter-spacing: -4px;
+}
+
+.wa-unit { font-size: 28px; color: rgba(34,197,94,0.5); }
+.wa-label { font-size: 13px; color: var(--muted); margin-top: 12px; font-family: 'DM Mono', monospace; letter-spacing: 1px; }
+
+.wa-facts {
+  padding: 80px 60px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  justify-content: center;
+}
+
+.wa-fact {
+  display: flex;
+  gap: 20px;
+  align-items: flex-start;
+  padding: 20px 24px;
+  border: 1px solid var(--border);
+  transition: border-color 0.2s;
+}
+
+.wa-fact:hover { border-color: rgba(34,197,94,0.3); }
+
+.wa-fact-n {
+  font-family: 'Playfair Display', serif;
+  font-size: 32px;
+  font-weight: 900;
+  color: #22c55e;
+  line-height: 1;
+  flex-shrink: 0;
+  min-width: 80px;
+}
+
+.wa-fact-text { font-size: 13px; color: var(--muted); line-height: 1.7; }
+.wa-fact-text strong { color: var(--cream); font-weight: 500; }
+
+/* ─── RESPONSIVE ─────────────────────────────────────── */
+@media(max-width:900px){
+  .stat-strip{grid-template-columns:1fr 1fr;}
+  .problem-grid,.dw-layout,.industries-intro,.roi-layout,.proof-layout,.final-cta,.wa-section{grid-template-columns:1fr;}
+  .ind-grid,.pkg-grid,.proc-grid{grid-template-columns:1fr;}
+  .process-grid{grid-template-columns:1fr 1fr;}
+  .proc-arrow{display:none;}
+  .sec{padding:60px 24px;}
+  .manifesto{padding:60px 24px;}
+  .final-cta{padding:60px 24px;}
+  .pullquote{padding:60px 24px;}
+  footer{padding:28px 24px;flex-direction:column;text-align:center;}
+  .wa-number,.wa-facts{padding:40px 24px;}
+  .cover{padding:80px 24px 60px;}
+  .roi-hero{padding:40px 20px;}
+  .roi-num{font-size:72px;}
+}
+</style>
+</head>
+<body>
+
+<!-- ═══════════════════════════════════════════════════════════
+     COVER
+════════════════════════════════════════════════════════════ -->
+<section class="cover">
+  <div class="cover-line"></div>
+
+  <div class="cover-eyebrow">
+    <div class="dot-live"></div>
+    <div class="eyebrow-text">AI Agent Geliştirme · B2B Satış Manifestosu · 2026</div>
+  </div>
+
+  <h1>
+    İşletmenizin<br>
+    en pahalı <em>çalışanı</em><br>
+    <span class="mag">uyuyor.</span>
+  </h1>
+
+  <p class="cover-sub">
+    Her gün mesai saati dışında gelen <strong>%38 müşteri</strong>, tekrar tekrar sorulan <strong>aynı soruları</strong> yanıtlayan personeliniz ve takip edilemeyen <strong>yüzlerce lead</strong> — tümünün çözümü tek bir sistemde.
+  </p>
+
+  <div class="stat-strip">
+    <div class="stat-box">
+      <div class="stat-n">%87<span class="unit"></span></div>
+      <div class="stat-label">Türkiye WhatsApp<br>penetrasyon oranı</div>
+    </div>
+    <div class="stat-box">
+      <div class="stat-n">%73<span class="unit"></span></div>
+      <div class="stat-label">Müşteri sorularının<br>tekrar oranı</div>
+    </div>
+    <div class="stat-box">
+      <div class="stat-n">82<span class="unit">sn</span></div>
+      <div class="stat-label">Müşterilerin beklediği<br>maksimum yanıt süresi</div>
+    </div>
+    <div class="stat-box">
+      <div class="stat-n">×20<span class="unit"></span></div>
+      <div class="stat-label">AI agent vs çalışan<br>maliyet farkı</div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════════
+     PULLQUOTE
+════════════════════════════════════════════════════════════ -->
+<section class="pullquote">
+  <blockquote>
+    Her işletme aslında bir <em>iletişim şirketi</em>dir. Ürün ne olursa olsun, para "konuşma"dan akar. Ve o konuşmaların %80'ini bir makine çok daha iyi, çok daha ucuza, hiç yorulmadan yürütebilir.
+    <cite>— Yapay Zeka Çağında İşletme Gerçeği</cite>
+  </blockquote>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════════
+     PROBLEM
+════════════════════════════════════════════════════════════ -->
+<section class="sec sec-alt">
+  <div class="s-label">Teşhis</div>
+  <div class="s-title">İşletmeniz her gün<br><em>kanıyor.</em> Sessizce.</div>
+
+  <div class="problem-grid">
+
+    <div class="prob-item">
+      <div class="prob-num">01</div>
+      <div class="prob-title">Mesai Sonrası Kör Nokta</div>
+      <div class="prob-desc">Müşterilerinizin <strong>%38-42'si</strong> saat 18:00 ile 10:00 arasında mesaj atıyor. Sabah 9'da ofis açıldığında o müşteri çoktan rakibinize gitmiş.</div>
+      <div class="prob-stat">→ Her 10 gelen mesajın 4'ü cevapsız kalıyor</div>
+    </div>
+
+    <div class="prob-item">
+      <div class="prob-num">02</div>
+      <div class="prob-title">Pahalı Tekrar Döngüsü</div>
+      <div class="prob-desc">Müşteri hizmetleri personeliniz zamanının <strong>%60-70'ini</strong> aynı soruları yanıtlamakla geçiriyor: "Ne zaman teslim?", "Fiyat nedir?", "Nasıl iptal ederim?"</div>
+      <div class="prob-stat">→ 1 çalışanın gerçek üretken zamanı ayda 40-60 saat</div>
+    </div>
+
+    <div class="prob-item">
+      <div class="prob-num">03</div>
+      <div class="prob-title">Lead Kanaması</div>
+      <div class="prob-desc">Bir müşteri ortalama <strong>5-7 temas noktasından</strong> sonra alım kararı verir. İşletmelerin %90'ı 2'den fazla takip yapmıyor. Potansiyel satışlar havaya uçuyor.</div>
+      <div class="prob-stat">→ Sistematik takip yapan işletmeler %450 daha fazla satış</div>
+    </div>
+
+    <div class="prob-item">
+      <div class="prob-num">04</div>
+      <div class="prob-title">Tutarsız Müşteri Deneyimi</div>
+      <div class="prob-desc">Bugün Ahmet bey harika, yarın Zeynep hanım yorgun. Personelinizin ruh hali, bilgi eksikliği, ya da kötü bir gün — müşteriniz <strong>farklı işletmelerle konuşuyor gibi</strong> hissediyor.</div>
+      <div class="prob-stat">→ CX tutarsızlığı müşteri kaybının #1 sebebi</div>
+    </div>
+
+    <div class="prob-item">
+      <div class="prob-num">05</div>
+      <div class="prob-title">Kayıp Veriler, Kör Kararlar</div>
+      <div class="prob-desc">WhatsApp konuşmaları, telefon görüşmeleri, walk-in ziyaretler — hiçbiri kayıt altında değil. Kimin ne istediğini, neden vazgeçtiğini, neyin işe yaradığını <strong>bilmiyorsunuz.</strong></div>
+      <div class="prob-stat">→ Veriye dayalı kararlar %23 daha yüksek karlılık</div>
+    </div>
+
+    <div class="prob-item">
+      <div class="prob-num">06</div>
+      <div class="prob-title">İnsan Kapasitesi Tavanı</div>
+      <div class="prob-desc">İşletmeniz büyüdükçe müşteri taleplerini karşılamak için sürekli yeni eleman alıyorsunuz. Ama her yeni eleman <strong>yeni maaş, yeni risk, yeni hata</strong> demek.</div>
+      <div class="prob-stat">→ Her yeni müşteri hizmetleri çalışanı: 5.000-12.000 TL/ay</div>
+    </div>
+
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════════
+     WHATSAPP — NEDEN
+════════════════════════════════════════════════════════════ -->
+<section class="sec">
+  <div class="s-label">Platform Gerçeği</div>
+  <div class="s-title">Müşteriniz zaten<br><em>orada.</em></div>
+  <p class="s-body">SMS'i kimse okumaz. E-posta kaybolur. Uygulama indirilmez. Ama WhatsApp — Türkiye'de neredeyse herkesin açık tuttuğu tek platform.</p>
+</section>
+
+<section class="wa-section sec-alt">
+  <div class="wa-number">
+    <div class="wa-big">%87</div>
+    <div class="wa-label">Türkiye'de WhatsApp<br>kullanım oranı</div>
+  </div>
+  <div class="wa-facts">
+    <div class="wa-fact">
+      <div class="wa-fact-n">%98</div>
+      <div class="wa-fact-text"><strong>WhatsApp mesaj açılma oranı.</strong> E-posta'da bu oran %20-22. 5 katlık fark — pazarlama bütçenizi nereye harcamalısınız artık biliyorsunuz.</div>
+    </div>
+    <div class="wa-fact">
+      <div class="wa-fact-n">4dk</div>
+      <div class="wa-fact-text"><strong>Ortalama WhatsApp mesaj yanıtlama süresi</strong> bireysel kullanıcılar için. Müşterileriniz bu hıza alışkın — işletmeniz bunu karşılamazsa başkası karşılar.</div>
+    </div>
+    <div class="wa-fact">
+      <div class="wa-fact-n">×3</div>
+      <div class="wa-fact-text"><strong>WhatsApp üzerinden gelen müşterilerin dönüşüm oranı</strong> diğer kanallara kıyasla. Çünkü konuşarak satın alıyorlar — ve konuşmayı biz otomatize ediyoruz.</div>
+    </div>
+    <div class="wa-fact">
+      <div class="wa-fact-n">24/7</div>
+      <div class="wa-fact-text"><strong>Hiç kapanmayan bir servis kanalı.</strong> Gece 02:00'de "fiyat nedir?" diye soran müşteri de cevap alıyor. O müşteri sabahı rakibinizde değil, sizde açıyor.</div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════════
+     DİJİTAL ÇALIŞAN
+════════════════════════════════════════════════════════════ -->
+<section class="sec">
+  <div class="s-label">Çözüm</div>
+  <div class="s-title">Bir çalışandan<br>değil, bir<br><em>sistemden</em> bahsediyoruz.</div>
+
+  <div class="dw-layout">
+    <div class="dw-left">
+      <div class="s-body" style="margin-top:0;margin-bottom:32px;">Geleneksel çalışan ile AI agent arasındaki karşılaştırma — kağıt üzerinde rekabet etmesi mümkün değil.</div>
+
+      <table class="vs-table">
+        <tr>
+          <td class="vs-attr"></td>
+          <td class="vs-head">Çalışan</td>
+          <td class="vs-head">AI Agent</td>
+        </tr>
+        <tr>
+          <td class="vs-attr">Çalışma saati</td>
+          <td class="vs-human">08:00–18:00</td>
+          <td class="vs-ai">7/24 · 365</td>
+        </tr>
+        <tr>
+          <td class="vs-attr">Eş zamanlı konuşma</td>
+          <td class="vs-human">1–2</td>
+          <td class="vs-ai">Sınırsız</td>
+        </tr>
+        <tr>
+          <td class="vs-attr">Yanıt süresi</td>
+          <td class="vs-human">2–8 saat</td>
+          <td class="vs-ai">&lt;3 saniye</td>
+        </tr>
+        <tr>
+          <td class="vs-attr">Aylık maliyet</td>
+          <td class="vs-human">5.000–15.000 TL</td>
+          <td class="vs-ai">Çok daha az</td>
+        </tr>
+        <tr>
+          <td class="vs-attr">Hastalık / izin riski</td>
+          <td class="vs-human">Her an</td>
+          <td class="vs-ai">Sıfır</td>
+        </tr>
+        <tr>
+          <td class="vs-attr">Bilgi tutarlılığı</td>
+          <td class="vs-human">Değişken</td>
+          <td class="vs-ai">%100 tutarlı</td>
+        </tr>
+        <tr>
+          <td class="vs-attr">Veri kaydı</td>
+          <td class="vs-human">Nadiren</td>
+          <td class="vs-ai">Her konuşma</td>
+        </tr>
+        <tr>
+          <td class="vs-attr">Eğitim süresi</td>
+          <td class="vs-human">2–8 hafta</td>
+          <td class="vs-ai">Sıfır (deploy anında)</td>
+        </tr>
+        <tr>
+          <td class="vs-attr">Ölçekleme</td>
+          <td class="vs-human">+1 kişi = +maaş</td>
+          <td class="vs-ai">Anında, maliyetsiz</td>
+        </tr>
+      </table>
+    </div>
+
+    <div class="dw-right">
+      <div class="cap-item">
+        <div class="cap-icon">🧠</div>
+        <div>
+          <div class="cap-title">Bağlamsal Hafıza</div>
+          <div class="cap-text">Müşterinizle 3 ay önce ne konuştuğunuzu hatırlar. "Geçen sefer sorduğunuz X konusunda güncelleme var" diyebilir. İnsan belleğini aşan bir müşteri deneyimi.</div>
+        </div>
+      </div>
+      <div class="cap-item">
+        <div class="cap-icon">📊</div>
+        <div>
+          <div class="cap-title">Gerçek Zamanlı Veri Entegrasyonu</div>
+          <div class="cap-text">Stok durumu, fiyat listesi, randevu takvimi, sipariş durumu — API entegrasyonuyla anlık veri. "Bakıp haber veririm" değil, anında cevap.</div>
+        </div>
+      </div>
+      <div class="cap-item">
+        <div class="cap-icon">🎯</div>
+        <div>
+          <div class="cap-title">Akıllı Lead Yönetimi</div>
+          <div class="cap-text">Her konuşmayı lead skoruyla değerlendirir. Sıcak, ılık, soğuk — otomatik kategorizasyon. Satış ekibinize yalnızca hazır müşterileri iletir. %0 zaman kaybı.</div>
+        </div>
+      </div>
+      <div class="cap-item">
+        <div class="cap-icon">🔔</div>
+        <div>
+          <div class="cap-title">Proaktif Sistem — Müşteriyi Bulmak</div>
+          <div class="cap-text">Müşteri gelene kadar beklemez. Randevu hatırlatması, ödeme son günü, sipariş hazır bildirimi — sistem müşteriyi bir adım önde tutar.</div>
+        </div>
+      </div>
+      <div class="cap-item">
+        <div class="cap-icon">📸</div>
+        <div>
+          <div class="cap-title">Görsel Zeka (GPT-4o Vision)</div>
+          <div class="cap-text">Müşteri fotoğraf gönderir — AI ne olduğunu anlar, işler, yanıtlar. Hasar tespiti, ürün tanıma, belge okuma, QR analizi. Görüntü artık ham veri değil.</div>
+        </div>
+      </div>
+      <div class="cap-item">
+        <div class="cap-icon">🛡️</div>
+        <div>
+          <div class="cap-title">Doğruluk Kalkanı — Sıfır Uydurma</div>
+          <div class="cap-text">Sistem emin olmadığı şeyi söylemez. Her cevap gerçek zamanlı doğrulanır, yanlış bilgi insana yönlendirilir. Markanızın itibarı korunur.</div>
+        </div>
+      </div>
+      <div class="cap-item">
+        <div class="cap-icon">🌍</div>
+        <div>
+          <div class="cap-title">Çok Dilli — Pazar Sınırı Yok</div>
+          <div class="cap-text">Türkçe, İngilizce, Rusça, Almanca, Arapça — otomatik dil tespiti ve yanıt. Uluslararası müşteri için ek çalışan gerekmiyor. Pazar büyüyor, maliyet büyümüyor.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════════
+     SEKTÖRLER
+════════════════════════════════════════════════════════════ -->
+<section class="sec sec-alt">
+  <div class="industries-intro">
+    <div>
+      <div class="s-label">Sektörel Uygulamalar</div>
+      <div class="s-title">Hangi sektörde<br>olursanız olun,<br><em>sorun aynı.</em></div>
+    </div>
+    <div class="s-body">10 farklı sektörde kanıtlanmış ağrı noktaları ve AI agent çözümleri. Her biri kendi dinamiklerine özel olarak tasarlanmış — tek bir şablonla değil.</div>
+  </div>
+
+  <div class="ind-grid">
+
+    <div class="ind-card">
+      <div class="ind-header">
+        <div class="ind-icon">🏠</div>
+        <div class="ind-name">Emlak & Gayrimenkul</div>
+        <div class="ind-tag">Kanıtlanmış · ILO projesi</div>
+      </div>
+      <div class="ind-body">
+        <div class="ind-pain">"Fiyat nedir?", "Ofisi kim temsil ediyor?", "Bölgede ne var?" — günde 50 aynı soru</div>
+        <div class="ind-sol">Fotoğraftan otomatik ilan oluşturma, <strong>gerçek zamanlı piyasa fiyat analizi</strong>, müşteri tipi tespiti (alıcı/satıcı/ofis), randevu yönetimi, tapu/kredi Q&A yönlendirme</div>
+        <div class="ind-wins">
+          <div class="ind-win">%65 azalan destek yükü</div>
+          <div class="ind-win">%38 daha hızlı ilan kapanması</div>
+          <div class="ind-win">7/24 alıcı nitelendirme</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="ind-card">
+      <div class="ind-header">
+        <div class="ind-icon">🏥</div>
+        <div class="ind-name">Klinik & Sağlık</div>
+        <div class="ind-tag">Yüksek etki</div>
+      </div>
+      <div class="ind-body">
+        <div class="ind-pain">Randevu iptalleri, hasta takibinin unutulması, "doktor ne zaman müsait?" trafiği sekreterleri eziyor</div>
+        <div class="ind-sol"><strong>Otomatik randevu yönetimi</strong>, hatırlatma (24saat + 2saat önce), iptal/değiştirme self-serve, test sonucu teslim bildirimi, ilaç yenileme hatırlatması, sigorta soru yönlendirmesi</div>
+        <div class="ind-wins">
+          <div class="ind-win">%45 randevu iptal azalması</div>
+          <div class="ind-win">Sekreter telefon yükü %70 düşüş</div>
+          <div class="ind-win">Hasta memnuniyeti ölçülebilir artış</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="ind-card">
+      <div class="ind-header">
+        <div class="ind-icon">🛍️</div>
+        <div class="ind-name">E-ticaret & Mağaza</div>
+        <div class="ind-tag">En yüksek hacim</div>
+      </div>
+      <div class="ind-body">
+        <div class="ind-pain">Sipariş durumu, iade süreci, ürün bilgisi — bunlar için tam zamanlı ekip tutmak karlılığı eritiyor</div>
+        <div class="ind-sol"><strong>Sipariş durumu self-serve</strong>, ürün öneri motoru (satın alma geçmişine göre), terk edilen sepet recovery mesajları, iade/değişim süreci otomasyonu, kampanya duyuruları</div>
+        <div class="ind-wins">
+          <div class="ind-win">%23 sepet recovery artışı</div>
+          <div class="ind-win">Müşteri hizmetleri %60 otomasyonu</div>
+          <div class="ind-win">Kişiselleştirilmiş satış artışı</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="ind-card">
+      <div class="ind-header">
+        <div class="ind-icon">🍽️</div>
+        <div class="ind-name">Restoran & F&B</div>
+        <div class="ind-tag">Yoğun operasyon</div>
+      </div>
+      <div class="ind-body">
+        <div class="ind-pain">Rezervasyon telefona bağlı, menü soruları servis ekibini meşgul ediyor, sadakat kartı elle yönetiliyor</div>
+        <div class="ind-sol"><strong>Masa rezervasyon otomasyonu</strong>, dijital menü Q&A (alerjen dahil), sadakat puan sistemi, özel gün hatırlatma (doğum günü, yıl dönümü), değerlendirme toplama</div>
+        <div class="ind-wins">
+          <div class="ind-win">Rezervasyon hataları sıfıra yakın</div>
+          <div class="ind-win">No-show %35 azalma (hatırlatmayla)</div>
+          <div class="ind-win">Tekrar ziyaret oranı artışı</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="ind-card">
+      <div class="ind-header">
+        <div class="ind-icon">⚖️</div>
+        <div class="ind-name">Hukuk Bürosu</div>
+        <div class="ind-tag">Yüksek değer lead</div>
+      </div>
+      <div class="ind-body">
+        <div class="ind-pain">Avukat zamanının %30'u nitelendirme görüşmelerine gidiyor — birçoğu gereksiz. Hukuki süreçler karmaşık, müvekkil kaybolup gidiyor</div>
+        <div class="ind-sol"><strong>Otomatik müvekkil nitelendirmesi</strong> (bütçe, konu, aciliyet), belge toplama checklist, dava aşaması güncelleme sistemi, ücret yapısı ön bilgilendirme, deadline hatırlatma</div>
+        <div class="ind-wins">
+          <div class="ind-win">Avukat saat verimi %40 artış</div>
+          <div class="ind-win">Niteliksiz görüşme %70 azalma</div>
+          <div class="ind-win">Müvekkil sadakat artışı</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="ind-card">
+      <div class="ind-header">
+        <div class="ind-icon">🚗</div>
+        <div class="ind-name">Otomotiv & Galeri</div>
+        <div class="ind-tag">Yüksek bilet satış</div>
+      </div>
+      <div class="ind-body">
+        <div class="ind-pain">Test sürüşü koordinasyonu manuel, fiyat müzakeresi tutarsız, servis hatırlatması sistematik değil</div>
+        <div class="ind-sol"><strong>Test sürüşü rezervasyon</strong>, piyasa fiyat karşılaştırma aracı, servis bakım hatırlatması, sigorta/muayene takibi, müzakere destek scripti, araç değerleme ön sorgu</div>
+        <div class="ind-wins">
+          <div class="ind-win">Test sürüşü dönüşüm artışı</div>
+          <div class="ind-win">Servis geliri tekrarlayan artış</div>
+          <div class="ind-win">Satış döngüsü kısalması</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="ind-card">
+      <div class="ind-header">
+        <div class="ind-icon">🎓</div>
+        <div class="ind-name">Eğitim & Kurslar</div>
+        <div class="ind-tag">Yüksek lead hacmi</div>
+      </div>
+      <div class="ind-body">
+        <div class="ind-pain">"Kurs ne zaman başlıyor?", "Ücret nedir?", "Kontenjan var mı?" — bunları yanıtlamak için kadro tutulur</div>
+        <div class="ind-sol"><strong>Otomatik kayıt nitelendirme</strong>, program bilgisi Q&A, ödeme planı sunumu, deneme ders rezervasyonu, devamsızlık uyarıları, sertifika süreç takibi</div>
+        <div class="ind-wins">
+          <div class="ind-win">Kayıt tamamlama oranı artışı</div>
+          <div class="ind-win">Veli/öğrenci iletişim yükü düşüşü</div>
+          <div class="ind-win">Devamsızlık %28 azalma</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="ind-card">
+      <div class="ind-header">
+        <div class="ind-icon">🏨</div>
+        <div class="ind-name">Otel & Turizm</div>
+        <div class="ind-tag">Sezonsal yoğunluk</div>
+      </div>
+      <div class="ind-body">
+        <div class="ind-pain">Sezon yoğunluğunda sorulara yetişilemiyor, müşteri beklentisi karşılanmıyor, check-in öncesi iletişim sistematik değil</div>
+        <div class="ind-sol"><strong>Rezervasyon öncesi Q&A</strong>, ulaşım/aktivite rehberliği, check-in hatırlatma + ön bilgilendirme, özel istek toplama, check-out sonrası değerlendirme, tekrar rezervasyon teşviki</div>
+        <div class="ind-wins">
+          <div class="ind-win">Müşteri memnuniyeti puanı artışı</div>
+          <div class="ind-win">Direkteks rezervasyon artışı</div>
+          <div class="ind-win">Tekrar konaklama oranı yükselmesi</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="ind-card">
+      <div class="ind-header">
+        <div class="ind-icon">💰</div>
+        <div class="ind-name">Finans & Sigorta</div>
+        <div class="ind-tag">Regulated sektör</div>
+      </div>
+      <div class="ind-body">
+        <div class="ind-pain">Lead nitelendirme çok zaman alıyor, belge toplama kaotik, poliçe yenileme hatırlatması sistematik değil</div>
+        <div class="ind-sol"><strong>Risk profili ön nitelendirme</strong>, belge checklist ve toplama, poliçe/sözleşme yenileme hatırlatma, hasar bildirimi ilk adım otomasyonu, ürün karşılaştırma sunumu</div>
+        <div class="ind-wins">
+          <div class="ind-win">Poliçe yenileme oranı artışı</div>
+          <div class="ind-win">Belge toplama süresi %60 kısalma</div>
+          <div class="ind-win">Danışman verimlilik artışı</div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════════
+     ROI
+════════════════════════════════════════════════════════════ -->
+<section class="sec">
+  <div class="s-label">Finansal Gerçeklik</div>
+  <div class="s-title">Yapmama maliyeti,<br>yapma maliyetinden<br><em>çok daha yüksek.</em></div>
+
+  <div class="roi-layout">
+
+    <div>
+      <div class="cost-box">
+        <div class="cost-header">⚠ Yapmama Maliyeti — Aylık Tahmini</div>
+        <div class="cost-row">
+          <span class="cost-name">Mesai dışı kaçan lead'ler (%38 × ort. değer)</span>
+          <span class="cost-val">₺18.000+</span>
+        </div>
+        <div class="cost-row">
+          <span class="cost-name">Tekrar soruları yanıtlayan personel zamanı</span>
+          <span class="cost-val">₺6.000+</span>
+        </div>
+        <div class="cost-row">
+          <span class="cost-name">Takip edilmeyen lead'lerin kayıp değeri</span>
+          <span class="cost-val">₺12.000+</span>
+        </div>
+        <div class="cost-row">
+          <span class="cost-name">Tutarsız deneyimden kaynaklanan müşteri kaybı</span>
+          <span class="cost-val">₺8.000+</span>
+        </div>
+        <div class="cost-row">
+          <span class="cost-name">Yavaş yanıt nedeniyle rakibe geçen müşteri</span>
+          <span class="cost-val">₺9.000+</span>
+        </div>
+        <div class="cost-row" style="background:rgba(244,63,94,0.06);">
+          <span class="cost-name" style="font-weight:600;color:#c8b8d8;">TOPLAM KAYIP (tahmini)</span>
+          <span class="cost-val" style="font-size:28px;">₺53.000+</span>
+        </div>
+      </div>
+    </div>
+
+    <div>
+      <div class="gain-box">
+        <div class="gain-header">✦ AI Agent ile Aylık Fayda</div>
+        <div class="gain-row">
+          <span class="gain-name">Mesai dışı yakalanan lead geliri</span>
+          <span class="gain-val">₺15.000+</span>
+        </div>
+        <div class="gain-row">
+          <span class="gain-name">Personel saati tasarrufu (80-100 saat/ay)</span>
+          <span class="gain-val">₺5.000+</span>
+        </div>
+        <div class="gain-row">
+          <span class="gain-name">Sistematik takipten ek dönüşüm</span>
+          <span class="gain-val">₺10.000+</span>
+        </div>
+        <div class="gain-row">
+          <span class="gain-name">Sadakat sistemi ile tekrar alım</span>
+          <span class="gain-val">₺7.000+</span>
+        </div>
+        <div class="gain-row">
+          <span class="gain-name">Daha hızlı yanıt → artan dönüşüm</span>
+          <span class="gain-val">₺8.000+</span>
+        </div>
+        <div class="gain-row" style="background:rgba(34,197,94,0.06);">
+          <span class="gain-name" style="font-weight:600;color:#c8b8d8;">TOPLAM FAYDA (tahmini)</span>
+          <span class="gain-val" style="font-size:28px;">₺45.000+</span>
+        </div>
+      </div>
+
+      <div style="margin-top:16px;padding:20px 24px;border:1px solid rgba(124,58,237,0.2);background:rgba(124,58,237,0.04);font-size:12px;color:var(--muted);font-family:'DM Mono',monospace;line-height:1.7;">
+        * Rakamlar sektör ve işletme büyüklüğüne göre değişir. Gerçek ROI analizi ücretsiz discovery görüşmemizde hesaplanır.
+      </div>
+    </div>
+
+    <div class="roi-hero">
+      <div class="roi-num">10–50<span>×</span></div>
+      <div class="roi-label">Ortalama yıllık ROI — ilk 12 ayda</div>
+      <div class="roi-sub">Geliştirme yatırımı genellikle ilk 60–90 günde geri döner</div>
+    </div>
+
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════════
+     KANIT — ILO
+════════════════════════════════════════════════════════════ -->
+<section class="sec sec-alt">
+  <div class="s-label">Vaka Çalışması</div>
+  <div class="s-title">Bu bir söz değil.<br><em>İspat.</em></div>
+  <p class="s-body">ILO, ilanpa.com için geliştirdiğimiz tam kapsamlı WhatsApp AI agent sistemi. 50+ servis, gerçek test çıktıları, gerçek sonuçlar.</p>
+
+  <div class="proof-layout">
+    <div class="proof-badge">
+      <div class="proof-icon">🏠</div>
+      <div class="proof-name">ILO</div>
+      <div class="proof-client">ilanpa.com · Alanya/Antalya</div>
+      <div class="proof-divider"></div>
+      <div class="proof-stats-mini">
+        <div class="pm-row"><span class="pm-label">Aktif servis sayısı</span><span class="pm-val">50+</span></div>
+        <div class="pm-row"><span class="pm-label">Hata önleme senaryosu</span><span class="pm-val">13/13 ✓</span></div>
+        <div class="pm-row"><span class="pm-label">Desteklenen dil</span><span class="pm-val">TR / EN / RU / DA</span></div>
+        <div class="pm-row"><span class="pm-label">Fiyat analizi (rakip)</span><span class="pm-val">12+ ilan/gerçek zamanlı</span></div>
+        <div class="pm-row"><span class="pm-label">Proaktif alert sistemi</span><span class="pm-val">09:00 + 20:00 + anlık</span></div>
+        <div class="pm-row"><span class="pm-label">Lead skoru</span><span class="pm-val">0–100 / cold-warm-hot</span></div>
+        <div class="pm-row"><span class="pm-label">Çalışma saati</span><span class="pm-val">7/24 · 365</span></div>
+      </div>
+    </div>
+
+    <div class="proof-right">
+      <div class="feat-row">
+        <div class="feat-num">01</div>
+        <div>
+          <div class="feat-title">Fotoğraftan Otomatik İlan (GPT-4o Vision)</div>
+          <div class="feat-text">Kullanıcı fotoğraf atar → AI kategori, marka, durum, fiyat aralığı çıkarır → 6 alan otomatik dolmuş, 2 alan soruluyor → ilan açılıyor. İnsan dakikalar harcıyor, ILO 3 saniyede yapıyor.</div>
+        </div>
+      </div>
+      <div class="feat-row">
+        <div class="feat-num">02</div>
+        <div>
+          <div class="feat-title">Gerçek Zamanlı Piyasa Fiyat Koçu</div>
+          <div class="feat-text">"fiyat analizi yap" → 12 rakip ilan taranıyor → medyan/min/max/ortalama → tahmini satış günü → fiyat önerisi → tek "evet" ile güncelleme. Kanıtlanmış çıktı: 82.000 TL → 67.450 TL önerisi, 49 günden 16 güne düşüş.</div>
+        </div>
+      </div>
+      <div class="feat-row">
+        <div class="feat-num">03</div>
+        <div>
+          <div class="feat-title">9 Kategorili Akıllı Problem Yönlendirme</div>
+          <div class="feat-text">Hesap, ödeme, ilan, teknik, dolandırıcılık, paket, şikayet — her biri kendi özel handler'ına gidiyor. 3 başarısız denemede otomatik insan aktarımı + admin anlık bildirim.</div>
+        </div>
+      </div>
+      <div class="feat-row">
+        <div class="feat-num">04</div>
+        <div>
+          <div class="feat-title">Sadakat & Tavsiye Motoru</div>
+          <div class="feat-text">6 kademe rozet sistemi (Yeni Üye → Marka Elçisi), aksiyonlarla puan kazanma (50–500 puan), tavsiye kodu, ödül kataloğu. "puanlarım" komutuyla anında bakiye görüntüleme.</div>
+        </div>
+      </div>
+      <div class="feat-row">
+        <div class="feat-num">05</div>
+        <div>
+          <div class="feat-title">Doğruluk Kalkanı — 13/13 Test Geçti</div>
+          <div class="feat-text">Quality Validator her cevabı denetler. 13 önceden tespit edilmiş hata senaryosu. "Yanlış bilgi verme haritası" — tümü test edildi, tümü geçti. Marka itibarı korunuyor.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════════
+     MANIFESTO
+════════════════════════════════════════════════════════════ -->
+<section class="manifesto">
+  <div class="s-label" style="justify-content:center;">Vizyon</div>
+  <div class="manifesto-lines">
+    <div class="m-line active">Her işletmenin bir <em>dijital sesi</em> olmalı.</div>
+    <div class="m-line">O ses hiç yorulmamalı, hiç yanlış söylememeli.</div>
+    <div class="m-line">Gece 03:00'de de müşteriye <em>doğru cevabı</em> vermeli.</div>
+    <div class="m-line">1 müşteriye de, 10.000 müşteriye de aynı anda.</div>
+    <div class="m-line">Ve her konuşmayı kayıt altına almalı —</div>
+    <div class="m-line">çünkü veri, <em>yarının kararı.</em></div>
+    <div class="m-line active">Bu gelecek değil. Bu bugün. <em>Hemen.</em></div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════════
+     SÜREÇ
+════════════════════════════════════════════════════════════ -->
+<section class="sec sec-alt2">
+  <div class="s-label">Nasıl Çalışıyoruz</div>
+  <div class="s-title">Discover. Build.<br><em>Deploy. Optimize.</em></div>
+
+  <div class="process-grid">
+    <div class="proc-step">
+      <div class="proc-arrow">›</div>
+      <div class="proc-n">01</div>
+      <div class="proc-title">Discovery</div>
+      <div class="proc-text">İşletmenizi derinlemesine anlıyoruz. Müşteri akışı, tekrar sorulan sorular, lead kaynakları, mevcut süreçler. Bu adımda çoğu zaman işletme sahibinin de farkında olmadığı kayıplar ortaya çıkıyor.</div>
+      <div class="proc-time">→ 1–3 gün</div>
+    </div>
+    <div class="proc-step">
+      <div class="proc-arrow">›</div>
+      <div class="proc-n">02</div>
+      <div class="proc-title">Tasarım & Mimari</div>
+      <div class="proc-text">Sektörünüze, müşteri tipinize ve hedefinize özel sistem tasarımı. Hangi servisler, hangi entegrasyonlar, hangi akışlar. Onaylı plan olmadan kod yazılmaz.</div>
+      <div class="proc-time">→ 3–7 gün</div>
+    </div>
+    <div class="proc-step">
+      <div class="proc-arrow">›</div>
+      <div class="proc-n">03</div>
+      <div class="proc-title">Geliştirme</div>
+      <div class="proc-text">Node.js backend, GPT-4o entegrasyonu, WhatsApp Business API, mevcut sistemlerinizle API bağlantısı. Her servis ayrı modül — bakım kolaylığı ve esneklik için.</div>
+      <div class="proc-time">→ 2–8 hafta</div>
+    </div>
+    <div class="proc-step">
+      <div class="proc-arrow">›</div>
+      <div class="proc-n">04</div>
+      <div class="proc-title">Test & İnce Ayar</div>
+      <div class="proc-text">Gerçek senaryolarla kapsamlı test. Doğruluk kalkanı kurulumu — işletmenize özel yanlış cevap haritası. Kenar vakalar, hata yönetimi, stress testi.</div>
+      <div class="proc-time">→ 1–2 hafta</div>
+    </div>
+    <div class="proc-step">
+      <div class="proc-n">05</div>
+      <div class="proc-title">Deploy & Büyüme</div>
+      <div class="proc-text">Canlıya alım. İlk 30 gün yoğun izleme ve ince ayar. Aylık performans raporu — dönüşüm, yanıt süresi, lead kalitesi. Sistem büyüdükçe birlikte büyüyoruz.</div>
+      <div class="proc-time">→ Süregelen</div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════════
+     PAKETLER
+════════════════════════════════════════════════════════════ -->
+<section class="sec">
+  <div class="s-label">Paketler</div>
+  <div class="s-title">Her ölçek için<br><em>doğru giriş noktası.</em></div>
+
+  <div class="pkg-grid">
+
+    <div class="pkg">
+      <div class="pkg-stripe"></div>
+      <div class="pkg-body">
+        <div class="pkg-tier">Temel</div>
+        <div class="pkg-name">Starter Agent</div>
+        <div class="pkg-desc">İlk AI agent deneyimi. Temel müşteri iletişimi otomasyonu. Küçük işletmeler ve tekil mağazalar için ideal başlangıç noktası.</div>
+        <div class="pkg-price">Keşif<span class="pkg-price-unit"> sonrası fiyat</span></div>
+        <div class="pkg-divider"></div>
+        <div class="pkg-features">
+          <div class="pf">7/24 WhatsApp cevaplama</div>
+          <div class="pf">Sık sorulan 50 soru otomasyonu</div>
+          <div class="pf">Temel lead toplama</div>
+          <div class="pf">Mesai sonrası cevaplama</div>
+          <div class="pf">Haftalık konuşma raporu</div>
+          <div class="pf">1 dil desteği</div>
+          <div class="pf">Doğruluk kalkanı (temel)</div>
+        </div>
+        <a href="#iletisim" class="pkg-cta">Keşif Görüşmesi</a>
+      </div>
+    </div>
+
+    <div class="pkg featured">
+      <div class="pkg-stripe"></div>
+      <div class="pkg-body">
+        <div class="pkg-tier">⭐ En Çok Tercih</div>
+        <div class="pkg-name">Growth Agent</div>
+        <div class="pkg-desc">ILO düzeyinde tam kapsamlı sistem. Proaktif uyarılar, lead yönetimi, sadakat motoru ve gerçek zamanlı piyasa entegrasyonuyla büyüme odaklı yapı.</div>
+        <div class="pkg-price">Keşif<span class="pkg-price-unit"> sonrası fiyat</span></div>
+        <div class="pkg-divider"></div>
+        <div class="pkg-features">
+          <div class="pf">Starter'ın tümü +</div>
+          <div class="pf">Proaktif uyarı & scheduler sistemi</div>
+          <div class="pf">Lead skoru (0–100, hot/warm/cold)</div>
+          <div class="pf">Sadakat & tavsiye motoru</div>
+          <div class="pf">Fiyat / piyasa analizi entegrasyonu</div>
+          <div class="pf">Çok dilli destek (4 dile kadar)</div>
+          <div class="pf">A/B test ve dönüşüm analizi</div>
+          <div class="pf">Fotoğraf → içerik otomasyonu</div>
+          <div class="pf">Broadcast & kampanya sistemi</div>
+          <div class="pf">Aylık ROI raporu</div>
+        </div>
+        <a href="#iletisim" class="pkg-cta">Keşif Görüşmesi</a>
+      </div>
+    </div>
+
+    <div class="pkg">
+      <div class="pkg-stripe"></div>
+      <div class="pkg-body">
+        <div class="pkg-tier">Kurumsal</div>
+        <div class="pkg-name">Enterprise Agent</div>
+        <div class="pkg-desc">Çok şubeli işletmeler, yüksek hacimli operasyonlar ve sektörün liderliğini hedefleyenler için tam özelleştirilebilir platform.</div>
+        <div class="pkg-price">Özel<span class="pkg-price-unit"> teklif</span></div>
+        <div class="pkg-divider"></div>
+        <div class="pkg-features">
+          <div class="pf">Growth'un tümü +</div>
+          <div class="pf">Çok şube / çok hesap yönetimi</div>
+          <div class="pf">ERP / CRM entegrasyonu</div>
+          <div class="pf">Özel sektör doğruluk kalkanı</div>
+          <div class="pf">Duygu analizi & churn önleme</div>
+          <div class="pf">Müzakere destek motoru</div>
+          <div class="pf">Aylık strateji oturumu</div>
+          <div class="pf">Öncelikli destek & SLA garantisi</div>
+          <div class="pf">Özel AI model fine-tuning</div>
+          <div class="pf">White-label seçeneği</div>
+        </div>
+        <a href="#iletisim" class="pkg-cta">Özel Teklif Al</a>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════════
+     CTA FINAL
+════════════════════════════════════════════════════════════ -->
+<section class="final-cta" id="iletisim">
+  <div class="cta-left">
+    <h2>
+      Hazır mısınız<br>gerçekten<br><em>büyümeye?</em>
+    </h2>
+    <p>
+      İlk adım ücretsiz bir keşif görüşmesi. 45 dakikada işletmenizin en büyük iletişim açığını tespit ediyoruz ve ne kadar tasarruf edebileceğinizi rakamlarla gösteriyoruz. Hiçbir yükümlülük yok.
+    </p>
+  </div>
+
+  <div class="cta-right">
+    <a href="mailto:info@example.com" class="cta-btn-p">Ücretsiz Keşif Görüşmesi →</a>
+    <a href="tel:+905010480738" class="cta-btn-s">Hemen Ara</a>
+
+    <div class="contact-info">
+      <div class="ci">📞 <strong>+90 501 048 07 38</strong></div>
+      <div class="ci">✉️ <strong>orhun@Ilanpa.com</strong></div>
+      <div class="ci">🌐 <strong>ilanpa.com</strong></div>
+      <div class="ci">📍 <strong>Alanya / Antalya</strong> · Türkiye geneli proje kapsamı</div>
+      <div class="ci" style="margin-top:8px;color:rgba(90,74,106,0.6);">Yanıt süresi: &lt;4 saat · Proje başlangıç: 1-2 hafta içinde</div>
+    </div>
+  </div>
+</section>
+
+<!-- ─── FOOTER ─────────────────────────────────────────── -->
+<footer>
+  <div class="f-logo">Dijital<span> Çalışan.</span></div>
+  <div class="f-copy">AI Agent Geliştirme · ILO Altyapısı · 2026 · ilanpa.com</div>
+  <div class="f-copy">Sektörsüz. Sınırsız. Durdurulmaz.</div>
+</footer>
+
+</body>
+</html>
