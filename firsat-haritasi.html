@@ -1,0 +1,2219 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FIRSAT İSTİHBARAT RAPORU — AI Sistemleri</title>
+<link href="https://fonts.googleapis.com/css2?family=Courier+Prime:ital,wght@0,400;0,700;1,400&family=Anton&family=Barlow+Condensed:wght@300;400;500;600;700;900&family=Barlow:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --ink:    #0a0e1a;
+  --ink2:   #0f1424;
+  --ink3:   #141828;
+  --navy:   #1a2035;
+  --blue:   #1e40af;
+  --cyan:   #06b6d4;
+  --red:    #dc2626;
+  --green:  #16a34a;
+  --amber:  #d97706;
+  --gold:   #f59e0b;
+  --cream:  #f8f4e8;
+  --border: rgba(30,64,175,0.2);
+  --text:   #94a3c4;
+  --muted:  #3a4a6a;
+  --white:  #e8eef8;
+}
+
+*{margin:0;padding:0;box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+
+body {
+  background: var(--ink);
+  color: var(--text);
+  font-family: 'Barlow', sans-serif;
+  font-weight: 300;
+  overflow-x: hidden;
+}
+
+/* Blueprint grid */
+body::before {
+  content:'';
+  position:fixed;
+  inset:0;
+  background-image:
+    linear-gradient(rgba(30,64,175,0.04) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(30,64,175,0.04) 1px, transparent 1px);
+  background-size:40px 40px;
+  pointer-events:none;
+  z-index:0;
+}
+
+/* corner marks */
+body::after {
+  content:'';
+  position:fixed;
+  inset:20px;
+  border:1px solid rgba(30,64,175,0.08);
+  pointer-events:none;
+  z-index:0;
+}
+
+/* ── CLASSIFIED STAMP ── */
+.stamp {
+  display: inline-block;
+  border: 3px solid var(--red);
+  color: var(--red);
+  font-family: 'Courier Prime', monospace;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 4px;
+  padding: 5px 14px;
+  transform: rotate(-8deg);
+  opacity: 0.85;
+  user-select: none;
+  flex-shrink: 0;
+}
+
+.stamp-green {
+  border-color: var(--green);
+  color: var(--green);
+  transform: rotate(3deg);
+}
+
+/* ── COVER ── */
+.cover {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  z-index: 1;
+  border-bottom: 1px solid var(--border);
+  overflow: hidden;
+}
+
+.cover-topbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 14px 60px;
+  border-bottom: 1px solid var(--border);
+  background: var(--ink2);
+  font-family: 'Courier Prime', monospace;
+  font-size: 10px;
+  letter-spacing: 2px;
+  color: var(--muted);
+}
+
+.topbar-id { color: var(--cyan); }
+
+.cover-main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 60px 60px 40px;
+}
+
+.cover-badges {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  margin-bottom: 48px;
+}
+
+.doc-type {
+  font-family: 'Courier Prime', monospace;
+  font-size: 11px;
+  color: var(--muted);
+  letter-spacing: 3px;
+  text-transform: uppercase;
+}
+
+.cover h1 {
+  font-family: 'Anton', sans-serif;
+  font-size: clamp(52px, 7vw, 110px);
+  line-height: 0.92;
+  letter-spacing: 2px;
+  color: var(--white);
+  margin-bottom: 12px;
+}
+
+.cover h1 .c { color: var(--cyan); }
+.cover h1 .r { color: var(--red); }
+.cover h1 .dim {
+  color: transparent;
+  -webkit-text-stroke: 1px rgba(30,64,175,0.3);
+}
+
+.cover-tagline {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: clamp(18px, 2.5vw, 32px);
+  font-weight: 300;
+  color: var(--muted);
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  margin-top: 8px;
+  margin-bottom: 48px;
+}
+
+.cover-tagline strong { color: var(--text); font-weight: 600; }
+
+/* intel summary boxes */
+.intel-row {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 1px;
+  background: var(--border);
+  border: 1px solid var(--border);
+}
+
+.intel-box {
+  background: var(--ink2);
+  padding: 20px 20px 16px;
+  position: relative;
+  transition: background 0.2s;
+}
+
+.intel-box:hover { background: var(--ink3); }
+
+.ib-label {
+  font-family: 'Courier Prime', monospace;
+  font-size: 9px;
+  color: var(--muted);
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  margin-bottom: 10px;
+  display: block;
+}
+
+.ib-val {
+  font-family: 'Anton', sans-serif;
+  font-size: 36px;
+  color: var(--white);
+  line-height: 1;
+  letter-spacing: 1px;
+}
+
+.ib-val.c { color: var(--cyan); }
+.ib-val.r { color: var(--red); }
+.ib-val.g { color: var(--green); }
+.ib-val.a { color: var(--gold); }
+
+.ib-sub {
+  font-size: 11px;
+  color: var(--muted);
+  margin-top: 6px;
+  font-family: 'Courier Prime', monospace;
+  line-height: 1.5;
+}
+
+/* animated scan line */
+.scanline {
+  position: absolute;
+  bottom: 0; left: 0; right: 0;
+  height: 2px;
+  background: var(--cyan);
+  opacity: 0;
+  animation: scan 4s ease-in-out infinite;
+}
+
+@keyframes scan {
+  0%{opacity:0;transform:translateY(0);}
+  20%{opacity:0.4;}
+  80%{opacity:0.4;}
+  100%{opacity:0;transform:translateY(-100px);}
+}
+
+/* cover bottom bar */
+.cover-bottom {
+  padding: 16px 60px;
+  border-top: 1px solid var(--border);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: var(--ink2);
+  font-family: 'Courier Prime', monospace;
+  font-size: 10px;
+  color: var(--muted);
+}
+
+/* ── SECTIONS ── */
+.sec {
+  padding: 80px 60px;
+  position: relative;
+  z-index: 1;
+  border-bottom: 1px solid var(--border);
+}
+
+.sec-dark { background: var(--ink2); }
+.sec-darker { background: var(--ink3); }
+
+.s-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  margin-bottom: 48px;
+  gap: 40px;
+  flex-wrap: wrap;
+}
+
+.s-label {
+  font-family: 'Courier Prime', monospace;
+  font-size: 10px;
+  color: var(--cyan);
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  margin-bottom: 12px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.s-label::before {
+  content:'▶';
+  font-size: 8px;
+  color: var(--blue);
+}
+
+.s-title {
+  font-family: 'Anton', sans-serif;
+  font-size: clamp(36px, 4.5vw, 64px);
+  color: var(--white);
+  line-height: 0.95;
+  letter-spacing: 1px;
+}
+
+.s-title .c { color: var(--cyan); }
+.s-title .r { color: var(--red); }
+.s-title .g { color: var(--green); }
+.s-title .a { color: var(--gold); }
+
+.s-desc {
+  font-size: 15px;
+  color: var(--muted);
+  line-height: 1.8;
+  max-width: 520px;
+}
+
+/* ── THE CORE INSIGHT ── */
+.core-insight {
+  background: linear-gradient(135deg, rgba(6,182,212,0.06) 0%, rgba(30,64,175,0.04) 100%);
+  border: 1px solid rgba(6,182,212,0.2);
+  border-left: 4px solid var(--cyan);
+  padding: 48px 52px;
+  position: relative;
+  overflow: hidden;
+}
+
+.core-insight::after {
+  content: 'CORE';
+  position: absolute;
+  right: 40px; top: 50%;
+  transform: translateY(-50%);
+  font-family: 'Anton', sans-serif;
+  font-size: 160px;
+  color: rgba(6,182,212,0.04);
+  letter-spacing: 4px;
+  pointer-events: none;
+  user-select: none;
+}
+
+.ci-title {
+  font-family: 'Courier Prime', monospace;
+  font-size: 10px;
+  color: var(--cyan);
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  margin-bottom: 20px;
+}
+
+.ci-text {
+  font-size: 22px;
+  color: var(--white);
+  line-height: 1.6;
+  font-weight: 400;
+  max-width: 800px;
+}
+
+.ci-text em { font-style: italic; color: var(--cyan); }
+.ci-text strong { color: var(--gold); font-weight: 600; }
+
+.pipeline-viz {
+  display: flex;
+  gap: 0;
+  margin-top: 40px;
+  background: var(--border);
+  align-items: stretch;
+}
+
+.pv-step {
+  flex: 1;
+  background: var(--ink);
+  padding: 20px 16px;
+  text-align: center;
+  position: relative;
+  border-right: 1px solid var(--border);
+}
+
+.pv-step:last-child { border-right: none; }
+
+.pv-step::after {
+  content: '→';
+  position: absolute;
+  right: -12px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--cyan);
+  font-size: 14px;
+  z-index: 2;
+  background: var(--ink2);
+  padding: 0 3px;
+}
+
+.pv-step:last-child::after { display: none; }
+
+.pv-icon { font-size: 22px; margin-bottom: 8px; }
+
+.pv-name {
+  font-family: 'Courier Prime', monospace;
+  font-size: 11px;
+  color: var(--cyan);
+  letter-spacing: 1px;
+  font-weight: 700;
+  margin-bottom: 4px;
+}
+
+.pv-desc { font-size: 11px; color: var(--muted); line-height: 1.5; }
+.pv-ilo { font-size: 10px; color: rgba(6,182,212,0.4); margin-top: 6px; font-family: 'Courier Prime', monospace; }
+
+/* ── OPPORTUNITY CARDS ── */
+.opp-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1px;
+  background: var(--border);
+}
+
+.opp {
+  background: var(--ink);
+  overflow: hidden;
+  transition: background 0.2s;
+  position: relative;
+}
+
+.opp:hover { background: var(--ink2); }
+
+/* Tier indicator */
+.opp::before {
+  content: attr(data-tier);
+  position: absolute;
+  top: 0; right: 0;
+  background: var(--ink3);
+  border-left: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+  padding: 4px 10px;
+  font-family: 'Courier Prime', monospace;
+  font-size: 9px;
+  letter-spacing: 1px;
+}
+
+.tier-1::before { color: var(--gold); }
+.tier-2::before { color: var(--cyan); }
+.tier-3::before { color: var(--text); }
+
+.opp-top {
+  padding: 28px 32px 22px;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  gap: 18px;
+  align-items: flex-start;
+}
+
+.opp-rank {
+  font-family: 'Anton', sans-serif;
+  font-size: 56px;
+  line-height: 1;
+  color: rgba(30,64,175,0.15);
+  flex-shrink: 0;
+  width: 56px;
+  text-align: center;
+}
+
+.opp-right {}
+
+.opp-name {
+  font-family: 'Anton', sans-serif;
+  font-size: 24px;
+  color: var(--white);
+  letter-spacing: 0.5px;
+  line-height: 1.1;
+  margin-bottom: 6px;
+}
+
+.opp-sub {
+  font-family: 'Courier Prime', monospace;
+  font-size: 10px;
+  color: var(--muted);
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
+
+.opp-body {
+  padding: 22px 32px 26px;
+}
+
+.opp-problem {
+  font-size: 13px;
+  color: rgba(220,38,38,0.7);
+  font-style: italic;
+  background: rgba(220,38,38,0.05);
+  border-left: 2px solid rgba(220,38,38,0.3);
+  padding: 10px 14px;
+  margin-bottom: 14px;
+  line-height: 1.7;
+  font-family: 'Courier Prime', monospace;
+}
+
+.opp-solution {
+  font-size: 13.5px;
+  color: var(--text);
+  line-height: 1.8;
+  margin-bottom: 16px;
+}
+
+.opp-solution strong { color: var(--white); font-weight: 500; }
+
+.opp-metrics {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1px;
+  background: var(--border);
+  margin-top: 16px;
+}
+
+.opp-metric {
+  background: var(--ink2);
+  padding: 12px 14px;
+  text-align: center;
+}
+
+.om-val {
+  font-family: 'Anton', sans-serif;
+  font-size: 20px;
+  color: var(--gold);
+  letter-spacing: 0.5px;
+  line-height: 1;
+}
+
+.om-label {
+  font-family: 'Courier Prime', monospace;
+  font-size: 9px;
+  color: var(--muted);
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  margin-top: 4px;
+}
+
+.ilo-reuse {
+  margin-top: 14px;
+  padding: 10px 12px;
+  background: rgba(6,182,212,0.04);
+  border: 1px solid rgba(6,182,212,0.12);
+  font-family: 'Courier Prime', monospace;
+  font-size: 11px;
+  color: rgba(6,182,212,0.6);
+  line-height: 1.6;
+  display: flex;
+  gap: 8px;
+  align-items: flex-start;
+}
+
+.ilo-reuse::before { content: '↺'; color: var(--cyan); flex-shrink: 0; }
+
+/* ── REVENUE MATRIX ── */
+.matrix-wrap {
+  overflow-x: auto;
+}
+
+table.matrix {
+  width: 100%;
+  border-collapse: collapse;
+  border: 1px solid var(--border);
+  min-width: 800px;
+  font-family: 'Courier Prime', monospace;
+}
+
+.matrix th {
+  padding: 14px 18px;
+  font-size: 10px;
+  color: var(--muted);
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  border-bottom: 1px solid var(--border);
+  border-right: 1px solid var(--border);
+  background: var(--ink3);
+  text-align: left;
+  font-weight: 700;
+}
+
+.matrix th:first-child { text-align: left; min-width: 200px; color: var(--cyan); }
+
+.matrix td {
+  padding: 13px 18px;
+  font-size: 12px;
+  color: var(--text);
+  border-bottom: 1px solid var(--border);
+  border-right: 1px solid var(--border);
+}
+
+.matrix td:first-child {
+  color: var(--white);
+  font-weight: 700;
+  font-size: 13px;
+}
+
+.matrix tr:hover td { background: rgba(30,64,175,0.04); }
+.matrix tr:last-child td { border-bottom: none; }
+
+.bar-cell { padding: 12px 18px; }
+
+.rev-bar {
+  height: 6px;
+  background: rgba(30,64,175,0.15);
+  position: relative;
+  overflow: hidden;
+}
+
+.rev-fill {
+  position: absolute;
+  top: 0; left: 0; bottom: 0;
+  background: linear-gradient(90deg, var(--blue), var(--cyan));
+  transition: width 1s ease;
+}
+
+.rev-fill.gold { background: linear-gradient(90deg, var(--amber), var(--gold)); }
+.rev-fill.green { background: linear-gradient(90deg, #15803d, var(--green)); }
+.rev-fill.red { background: linear-gradient(90deg, #991b1b, var(--red)); }
+
+.mval {
+  font-family: 'Anton', sans-serif;
+  font-size: 15px;
+  letter-spacing: 0.5px;
+}
+
+.mval.gold { color: var(--gold); }
+.mval.green { color: var(--green); }
+.mval.cyan { color: var(--cyan); }
+.mval.red { color: var(--red); }
+.mval.muted { color: var(--muted); }
+
+.star { color: var(--gold); }
+
+/* priority badge */
+.pri {
+  display: inline-block;
+  padding: 3px 9px;
+  font-size: 9px;
+  letter-spacing: 1.5px;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.pri-1 { background: rgba(245,158,11,0.12); color: var(--gold); border: 1px solid rgba(245,158,11,0.2); }
+.pri-2 { background: rgba(6,182,212,0.08); color: var(--cyan); border: 1px solid rgba(6,182,212,0.15); }
+.pri-3 { background: rgba(94,104,130,0.1); color: var(--muted); border: 1px solid var(--border); }
+
+/* ── VOICE AI DEEP DIVE ── */
+.voice-layout {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1px;
+  background: var(--border);
+}
+
+.voice-side {
+  background: var(--ink);
+  padding: 40px;
+}
+
+.voice-stat-big {
+  font-family: 'Anton', sans-serif;
+  font-size: 80px;
+  color: var(--gold);
+  line-height: 1;
+  letter-spacing: 2px;
+  margin-bottom: 8px;
+}
+
+.voice-stat-label {
+  font-family: 'Courier Prime', monospace;
+  font-size: 11px;
+  color: var(--muted);
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  margin-bottom: 24px;
+}
+
+.call-types {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  background: var(--border);
+}
+
+.call-row {
+  background: var(--ink2);
+  display: flex;
+  align-items: center;
+  gap: 0;
+  overflow: hidden;
+}
+
+.call-pct {
+  font-family: 'Anton', sans-serif;
+  font-size: 22px;
+  color: var(--gold);
+  padding: 12px 16px;
+  min-width: 70px;
+  background: rgba(245,158,11,0.05);
+  border-right: 1px solid var(--border);
+  text-align: center;
+}
+
+.call-label {
+  font-size: 12.5px;
+  color: var(--text);
+  padding: 12px 16px;
+  flex: 1;
+}
+
+.call-ai {
+  font-family: 'Courier Prime', monospace;
+  font-size: 10px;
+  padding: 12px 14px;
+  border-left: 1px solid var(--border);
+}
+
+.call-ai.yes { color: var(--green); }
+.call-ai.no { color: var(--muted); }
+
+.voice-tech {
+  margin-top: 24px;
+  padding: 20px;
+  background: var(--ink2);
+  border: 1px solid var(--border);
+}
+
+.vt-title {
+  font-family: 'Courier Prime', monospace;
+  font-size: 10px;
+  color: var(--cyan);
+  letter-spacing: 2px;
+  margin-bottom: 14px;
+  text-transform: uppercase;
+}
+
+.tech-stack-pills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.tp {
+  background: var(--ink);
+  border: 1px solid var(--border);
+  padding: 5px 12px;
+  font-family: 'Courier Prime', monospace;
+  font-size: 11px;
+  color: var(--muted);
+  transition: all 0.15s;
+}
+
+.tp:hover { border-color: var(--cyan); color: var(--cyan); }
+.tp.core { color: var(--cyan); border-color: rgba(6,182,212,0.3); background: rgba(6,182,212,0.04); }
+
+.roi-calc {
+  background: var(--ink2);
+  border: 1px solid var(--border);
+  overflow: hidden;
+}
+
+.roi-header {
+  padding: 14px 20px;
+  background: var(--ink3);
+  border-bottom: 1px solid var(--border);
+  font-family: 'Courier Prime', monospace;
+  font-size: 10px;
+  color: var(--cyan);
+  letter-spacing: 2px;
+  text-transform: uppercase;
+}
+
+.roi-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 12px 20px;
+  border-bottom: 1px solid var(--border);
+  font-size: 13px;
+  align-items: center;
+}
+
+.roi-row:last-child { border-bottom: none; }
+.roi-name { color: var(--text); }
+.roi-val { font-family: 'Courier Prime', monospace; font-weight: 700; }
+.roi-val.cost { color: var(--red); }
+.roi-val.gain { color: var(--green); }
+.roi-val.total { color: var(--gold); font-size: 16px; }
+
+/* ── ENTERPRISE BRAIN ── */
+.brain-layout {
+  display: grid;
+  grid-template-columns: 1fr 1.5fr;
+  gap: 1px;
+  background: var(--border);
+  align-items: stretch;
+}
+
+.brain-left {
+  background: var(--ink);
+  padding: 40px;
+}
+
+.brain-right {
+  background: var(--ink2);
+  padding: 40px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.use-case {
+  padding: 18px 20px;
+  border: 1px solid var(--border);
+  background: var(--ink);
+  display: flex;
+  gap: 16px;
+  align-items: flex-start;
+  transition: border-color 0.15s;
+}
+
+.use-case:hover { border-color: rgba(6,182,212,0.3); }
+
+.uc-icon { font-size: 20px; flex-shrink: 0; margin-top: 2px; }
+
+.uc-title {
+  font-size: 14px;
+  color: var(--white);
+  font-weight: 500;
+  margin-bottom: 4px;
+}
+
+.uc-text {
+  font-size: 12px;
+  color: var(--muted);
+  line-height: 1.6;
+  font-family: 'Courier Prime', monospace;
+}
+
+.uc-roi {
+  font-size: 11px;
+  color: var(--green);
+  margin-top: 4px;
+  font-family: 'Courier Prime', monospace;
+}
+
+/* ── PLATFORM PLAY ── */
+.platform-diagram {
+  position: relative;
+  padding: 60px;
+  text-align: center;
+  background: var(--ink2);
+  border: 1px solid var(--border);
+  overflow: hidden;
+}
+
+.platform-diagram::before {
+  content: '';
+  position: absolute;
+  width: 600px; height: 600px;
+  border-radius: 50%;
+  border: 1px solid rgba(6,182,212,0.06);
+  top: 50%; left: 50%;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+}
+
+.platform-diagram::after {
+  content: '';
+  position: absolute;
+  width: 400px; height: 400px;
+  border-radius: 50%;
+  border: 1px solid rgba(6,182,212,0.08);
+  top: 50%; left: 50%;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+}
+
+.pd-center {
+  display: inline-block;
+  background: linear-gradient(135deg, rgba(6,182,212,0.15) 0%, rgba(30,64,175,0.1) 100%);
+  border: 2px solid rgba(6,182,212,0.4);
+  padding: 24px 40px;
+  position: relative;
+  z-index: 1;
+  margin-bottom: 40px;
+}
+
+.pd-center-title {
+  font-family: 'Anton', sans-serif;
+  font-size: 28px;
+  color: var(--cyan);
+  letter-spacing: 2px;
+}
+
+.pd-center-sub {
+  font-family: 'Courier Prime', monospace;
+  font-size: 11px;
+  color: var(--muted);
+  letter-spacing: 1px;
+  margin-top: 4px;
+}
+
+.channels-ring {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 8px;
+  position: relative;
+  z-index: 1;
+}
+
+.ch-node {
+  padding: 10px 18px;
+  border: 1px solid var(--border);
+  background: var(--ink);
+  font-family: 'Courier Prime', monospace;
+  font-size: 12px;
+  color: var(--text);
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.ch-node:hover {
+  border-color: var(--cyan);
+  color: var(--cyan);
+  background: rgba(6,182,212,0.05);
+}
+
+.ch-dot {
+  width: 5px; height: 5px;
+  border-radius: 50%;
+  background: var(--cyan);
+  animation: blink2 2s step-end infinite;
+}
+
+@keyframes blink2 { 0%,100%{opacity:1;}50%{opacity:0.2;} }
+
+/* ── BUILD ORDER ── */
+.build-order {
+  display: grid;
+  grid-template-columns: 60px 1fr;
+  gap: 0;
+}
+
+.bo-row {
+  display: contents;
+}
+
+.bo-num {
+  background: var(--ink2);
+  border-bottom: 1px solid var(--border);
+  border-right: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Anton', sans-serif;
+  font-size: 28px;
+  color: rgba(30,64,175,0.2);
+  padding: 24px 0;
+}
+
+.bo-content {
+  background: var(--ink);
+  border-bottom: 1px solid var(--border);
+  padding: 24px 32px;
+  display: flex;
+  gap: 24px;
+  align-items: flex-start;
+  transition: background 0.15s;
+}
+
+.bo-content:hover { background: var(--ink2); }
+
+.bo-phase {
+  font-family: 'Courier Prime', monospace;
+  font-size: 9px;
+  color: var(--cyan);
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  margin-bottom: 6px;
+}
+
+.bo-name {
+  font-size: 17px;
+  font-weight: 600;
+  color: var(--white);
+  margin-bottom: 6px;
+}
+
+.bo-why {
+  font-size: 13px;
+  color: var(--muted);
+  line-height: 1.7;
+}
+
+.bo-why strong { color: var(--text); font-weight: 500; }
+
+.bo-meta {
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 6px;
+  min-width: 140px;
+}
+
+.bo-revenue {
+  font-family: 'Anton', sans-serif;
+  font-size: 22px;
+  color: var(--gold);
+  letter-spacing: 0.5px;
+}
+
+.bo-time {
+  font-family: 'Courier Prime', monospace;
+  font-size: 10px;
+  color: var(--muted);
+  letter-spacing: 1px;
+  text-align: right;
+}
+
+/* ── COMPOUND EFFECT ── */
+.compound-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1px;
+  background: var(--border);
+}
+
+.compound-col {
+  background: var(--ink);
+  padding: 32px 28px;
+  text-align: center;
+  transition: background 0.2s;
+  border-top: 3px solid transparent;
+}
+
+.compound-col:hover { background: var(--ink2); border-top-color: var(--cyan); }
+.compound-col.active { background: rgba(6,182,212,0.04); border-top-color: var(--gold); }
+
+.cc-month {
+  font-family: 'Courier Prime', monospace;
+  font-size: 10px;
+  color: var(--muted);
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  margin-bottom: 16px;
+}
+
+.cc-clients {
+  font-family: 'Anton', sans-serif;
+  font-size: 52px;
+  color: var(--white);
+  line-height: 1;
+  letter-spacing: 1px;
+}
+
+.cc-label {
+  font-size: 11px;
+  color: var(--muted);
+  font-family: 'Courier Prime', monospace;
+  margin-top: 4px;
+  margin-bottom: 16px;
+}
+
+.cc-revenue {
+  font-family: 'Anton', sans-serif;
+  font-size: 28px;
+  letter-spacing: 0.5px;
+  line-height: 1;
+}
+
+.cc-revenue.c1 { color: var(--text); }
+.cc-revenue.c2 { color: var(--cyan); }
+.cc-revenue.c3 { color: var(--gold); }
+.cc-revenue.c4 { color: var(--green); }
+
+.cc-rev-label {
+  font-size: 10px;
+  color: var(--muted);
+  font-family: 'Courier Prime', monospace;
+  margin-top: 4px;
+  margin-bottom: 14px;
+}
+
+.cc-products {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  text-align: left;
+  margin-top: 16px;
+  padding-top: 16px;
+  border-top: 1px solid var(--border);
+}
+
+.cc-product {
+  font-family: 'Courier Prime', monospace;
+  font-size: 10px;
+  color: var(--muted);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.cc-product::before { content: '·'; color: var(--cyan); }
+
+/* ── CTA ── */
+.final {
+  padding: 100px 60px;
+  text-align: center;
+  position: relative;
+  z-index: 1;
+  overflow: hidden;
+}
+
+.final::before {
+  content: '';
+  position: absolute;
+  width: 800px; height: 800px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(30,64,175,0.08) 0%, transparent 65%);
+  top: 50%; left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+.final-stamp {
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+  margin-bottom: 40px;
+}
+
+.final h2 {
+  font-family: 'Anton', sans-serif;
+  font-size: clamp(48px, 7vw, 96px);
+  color: var(--white);
+  line-height: 0.95;
+  letter-spacing: 2px;
+  position: relative;
+  z-index: 1;
+}
+
+.final h2 .c { color: var(--cyan); }
+.final h2 .dim {
+  color: transparent;
+  -webkit-text-stroke: 1px rgba(30,64,175,0.3);
+}
+
+.final-sub {
+  font-size: 17px;
+  color: var(--muted);
+  line-height: 1.8;
+  max-width: 600px;
+  margin: 24px auto 0;
+  position: relative;
+  z-index: 1;
+  font-family: 'Courier Prime', monospace;
+}
+
+/* ── FOOTER ── */
+footer {
+  background: #050810;
+  border-top: 1px solid var(--border);
+  padding: 24px 60px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-family: 'Courier Prime', monospace;
+  font-size: 10px;
+  color: var(--muted);
+  letter-spacing: 1.5px;
+  position: relative;
+  z-index: 1;
+}
+
+/* ── RESPONSIVE ── */
+@media(max-width:900px){
+  .sec{padding:48px 24px;}
+  .cover-main,.cover-topbar,.cover-bottom,.final,footer{padding-left:24px;padding-right:24px;}
+  .intel-row{grid-template-columns:1fr 1fr;}
+  .opp-grid,.voice-layout,.brain-layout{grid-template-columns:1fr;}
+  .compound-grid{grid-template-columns:1fr 1fr;}
+  .pipeline-viz{flex-direction:column;}
+  .pv-step::after{display:none;}
+  .matrix{font-size:11px;}
+  .build-order{grid-template-columns:40px 1fr;}
+  .bo-content{flex-direction:column;}
+  .bo-meta{align-items:flex-start;}
+  .cover h1{font-size:52px;}
+}
+</style>
+</head>
+<body>
+
+<!-- ══════════════════════════════════════════════════════
+     COVER
+══════════════════════════════════════════════════════ -->
+<section class="cover">
+  <div class="cover-topbar">
+    <span class="topbar-id">DOC-ID: AI-OPP-2026-001</span>
+    <span>FIRSAT İSTİHBARAT ANALİZİ</span>
+    <span>YAZAR: SİSTEM MİMARLIĞI DEPARTMANİ</span>
+  </div>
+
+  <div class="cover-main">
+    <div class="cover-badges">
+      <div class="stamp">GİZLİ</div>
+      <div class="doc-type">// Stratejik Fırsat Haritası · AI Sistemleri · Türkiye</div>
+    </div>
+
+    <h1>
+      ILO<br>
+      <span class="dim">SADECE</span><br>
+      <span class="c">BAŞLANGIÇ</span>
+    </h1>
+
+    <div class="cover-tagline">
+      WhatsApp'ın ötesi: <strong>₺0 → ₺500K+</strong> yıllık gelir portföyü
+    </div>
+
+    <div class="intel-row">
+      <div class="intel-box">
+        <div class="scanline"></div>
+        <span class="ib-label">Tespit Edilen Fırsat</span>
+        <div class="ib-val c">12</div>
+        <div class="ib-sub">farklı ürün kategorisi</div>
+      </div>
+      <div class="intel-box">
+        <span class="ib-label">En Yüksek Tek Proje</span>
+        <div class="ib-val a">₺500K</div>
+        <div class="ib-sub">enterprise kontrat</div>
+      </div>
+      <div class="intel-box">
+        <span class="ib-label">ILO'dan Devreden Skill</span>
+        <div class="ib-val c">%80</div>
+        <div class="ib-sub">teknik altyapı</div>
+      </div>
+      <div class="intel-box">
+        <span class="ib-label">Türkiye Rekabet Durumu</span>
+        <div class="ib-val r">DÜŞÜK</div>
+        <div class="ib-sub">pazar boş</div>
+      </div>
+      <div class="intel-box">
+        <span class="ib-label">6. Ay Hedef Gelir</span>
+        <div class="ib-val g">₺200K+</div>
+        <div class="ib-sub">aylık recurring</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="cover-bottom">
+    <span>HAZIRLANMA: ŞUBAT 2026</span>
+    <span>KAPSAM: TÜRKİYE B2B AI SİSTEMLERİ PAZARI</span>
+    <span>GİZLİLİK: SADECE DAHİLİ KULLANIM</span>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════════════
+     CORE INSIGHT
+══════════════════════════════════════════════════════ -->
+<section class="sec">
+  <div class="s-label">Temel İçgörü</div>
+
+  <div class="core-insight">
+    <div class="ci-title">// GERÇEK YETENEĞİN TANIMI</div>
+    <div class="ci-text">
+      ILO bir WhatsApp botu değil. ILO şunu kanıtladı:<br>
+      <em>"Doğal dil → Anlama → Karar → Aksiyon → Gerçek dünya etkisi"</em><br>
+      pipeline'ını kurabiliyorsun. Bu yetenek WhatsApp ile sınırlı değil —<br>
+      <strong>her iş süreci bu pipeline'a muhtaç.</strong>
+    </div>
+
+    <div class="pipeline-viz">
+      <div class="pv-step">
+        <div class="pv-icon">💬</div>
+        <div class="pv-name">GİRDİ</div>
+        <div class="pv-desc">Metin, ses, görüntü, veri</div>
+        <div class="pv-ilo">ILO: WhatsApp mesajı</div>
+      </div>
+      <div class="pv-step">
+        <div class="pv-icon">🧠</div>
+        <div class="pv-name">ANLAMA</div>
+        <div class="pv-desc">Intent, kategori, öncelik tespiti</div>
+        <div class="pv-ilo">ILO: Problem Router</div>
+      </div>
+      <div class="pv-step">
+        <div class="pv-icon">⚡</div>
+        <div class="pv-name">KARAR</div>
+        <div class="pv-desc">İş kuralları + AI + veri</div>
+        <div class="pv-ilo">ILO: 9 Handler + AI Orchestrator</div>
+      </div>
+      <div class="pv-step">
+        <div class="pv-icon">🔌</div>
+        <div class="pv-name">AKSİYON</div>
+        <div class="pv-desc">API çağrısı, DB yazma, bildirim</div>
+        <div class="pv-ilo">ILO: ilanpa REST API</div>
+      </div>
+      <div class="pv-step">
+        <div class="pv-icon">📊</div>
+        <div class="pv-name">ETKİ</div>
+        <div class="pv-desc">Ölçülebilir iş sonucu</div>
+        <div class="pv-ilo">ILO: Satış, lead, tasarruf</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════════════
+     12 FIRSAT
+══════════════════════════════════════════════════════ -->
+<section class="sec sec-dark">
+  <div class="s-header">
+    <div>
+      <div class="s-label">Fırsat Kataloğu</div>
+      <div class="s-title">12 ÜRÜN.<br><span class="c">HEPSİ ILO'DAN</span><br><span class="dim">DOĞUYOR.</span></div>
+    </div>
+    <div class="s-desc">Her fırsat, ILO'yu inşa ederken kazanılan teknik yetkinliklerden doğrudan türüyor. Sıfırdan başlamıyorsun — %80 altyapı hazır.</div>
+  </div>
+
+  <div class="opp-grid">
+
+    <!-- 1 -->
+    <div class="opp tier-1" data-tier="TIER-1 · EN YÜKSEK">
+      <div class="opp-top">
+        <div class="opp-rank">1</div>
+        <div class="opp-right">
+          <div class="opp-name">SESLI AI RESEPSIYONIST</div>
+          <div class="opp-sub">Voice AI · Phone Call Automation · 7/24</div>
+        </div>
+      </div>
+      <div class="opp-body">
+        <div class="opp-problem">"Diş kliniğimiz günde 80 telefon alıyor. 60'ı 'saat kaçta açıksınız?' Bunun için 2 resepsiyonist tutuyoruz."</div>
+        <div class="opp-solution">
+          Twilio + ElevenLabs + GPT-4 ile <strong>telefonu alan, randevu alan, soru yanıtlayan, gerekirse insana aktaran</strong> bir ses AI'ı. Türkçe konuşuyor, doğal ses tonu var, acil durumda alarm veriyor. Resepsiyonist maliyetinin <strong>1/10'una</strong> çalışıyor.
+        </div>
+        <div class="opp-metrics">
+          <div class="opp-metric">
+            <div class="om-val">₺8-20K</div>
+            <div class="om-label">Aylık / müşteri</div>
+          </div>
+          <div class="opp-metric">
+            <div class="om-val">500K+</div>
+            <div class="om-label">TR hedef pazar</div>
+          </div>
+          <div class="opp-metric">
+            <div class="om-val">DÜŞÜK</div>
+            <div class="om-label">Rekabet</div>
+          </div>
+        </div>
+        <div class="ilo-reuse">ILO'dan devreden: Problem Router mantığı, Quality Validator, insan aktarım sistemi, proaktif scheduler. Telefon = WhatsApp'ın ses versiyonu.</div>
+      </div>
+    </div>
+
+    <!-- 2 -->
+    <div class="opp tier-1" data-tier="TIER-1 · EN YÜKSEK">
+      <div class="opp-top">
+        <div class="opp-rank">2</div>
+        <div class="opp-right">
+          <div class="opp-name">ŞİRKET BEYNİ (INTERNAL AI)</div>
+          <div class="opp-sub">Enterprise Knowledge Base · Employee Assistant</div>
+        </div>
+      </div>
+      <div class="opp-body">
+        <div class="opp-problem">"500 çalışanımız var. 'Masraf formu nasıl doldurulur?' sorusu için bile IT'yi arıyorlar. Yöneticilerimiz aynı soruları defalarca yanıtlıyor."</div>
+        <div class="opp-solution">
+          Şirketin tüm PDF'leri, politikaları, toplantı notları, süreç dokümanları — <strong>hepsi bir AI'ya yükleniyor.</strong> Çalışan soruyor: "İzin talebimi nasıl yapayım?" — AI anında doğru cevabı veriyor. Muhasebe soruyor: "Q3 bütçe kararı ne oldu?" — AI toplantı notundan buluyor.
+        </div>
+        <div class="opp-metrics">
+          <div class="opp-metric">
+            <div class="om-val">₺80-500K</div>
+            <div class="om-label">Proje bedeli</div>
+          </div>
+          <div class="opp-metric">
+            <div class="om-val">₺15-30K</div>
+            <div class="om-label">Aylık bakım</div>
+          </div>
+          <div class="opp-metric">
+            <div class="om-val">YOK</div>
+            <div class="om-label">TR Rakip</div>
+          </div>
+        </div>
+        <div class="ilo-reuse">ILO'dan devralan: Platform Knowledge sistemi, Quality Validator (yanlış bilgi engelleme), AI Orchestrator, context memory. Aynı mantık, farklı veri kaynağı.</div>
+      </div>
+    </div>
+
+    <!-- 3 -->
+    <div class="opp tier-1" data-tier="TIER-1 · EN YÜKSEK">
+      <div class="opp-top">
+        <div class="opp-rank">3</div>
+        <div class="opp-right">
+          <div class="opp-name">BELGE ZEKASİ PIPELINE'I</div>
+          <div class="opp-sub">Document AI · Contract Analysis · OCR + Extraction</div>
+        </div>
+      </div>
+      <div class="opp-body">
+        <div class="opp-problem">"Hukuk büromuz her ay 200+ sözleşme inceliyor. Avukat zamanının %40'ı belge okumakla geçiyor. Due diligence için 2 hafta harcıyoruz."</div>
+        <div class="opp-solution">
+          Sözleşme yükle → <strong>AI riskli maddeleri işaretliyor,</strong> KVKK uyumsuzluklarını tespit ediyor, özet çıkarıyor, karşılaştırıyor. Banka: 500 kredi dosyasını 5 dakikada önceliklendiriyor. Mülkiyet devri: tapu belgelerinden otomatik veri çekimi.
+        </div>
+        <div class="opp-metrics">
+          <div class="opp-metric">
+            <div class="om-val">₺50-300K</div>
+            <div class="om-label">Proje bedeli</div>
+          </div>
+          <div class="opp-metric">
+            <div class="om-val">Hukuk/Banka</div>
+            <div class="om-label">Birincil hedef</div>
+          </div>
+          <div class="opp-metric">
+            <div class="om-val">YOK</div>
+            <div class="om-label">TR Rakip</div>
+          </div>
+        </div>
+        <div class="ilo-reuse">ILO'dan devralan: GPT-4o Vision (photo-to-ad → foto-to-document), Quality Validator, AI Orchestrator pipeline. Photo-to-ad = document-to-data.</div>
+      </div>
+    </div>
+
+    <!-- 4 -->
+    <div class="opp tier-1" data-tier="TIER-1 · EN YÜKSEK">
+      <div class="opp-top">
+        <div class="opp-rank">4</div>
+        <div class="opp-right">
+          <div class="opp-name">AI SATIŞ GELİŞTİRME TEMSİLCİSİ</div>
+          <div class="opp-sub">Automated SDR · Outbound Pipeline · Lead Qualification</div>
+        </div>
+      </div>
+      <div class="opp-body">
+        <div class="opp-problem">"Satış ekibimiz soğuk mail atmakla, takip etmekle, randevu almakla zaman kaybediyor. Gerçek satış için zamanları kalmıyor."</div>
+        <div class="opp-solution">
+          Lead bulma → araştırma → <strong>kişiselleştirilmiş outreach → 6 dokunuşlu takip → randevu ayarlama → sıcak lead'i insan satışçıya teslim.</strong> Şirketlerin SDR ekibine ₺30-50K/ay ödediği işi AI ₺8K'ya yapıyor. Üstüne başarı bazlı ücret de alınabilir.
+        </div>
+        <div class="opp-metrics">
+          <div class="opp-metric">
+            <div class="om-val">₺8-20K</div>
+            <div class="om-label">Aylık / müşteri</div>
+          </div>
+          <div class="opp-metric">
+            <div class="om-val">+%5/toplantı</div>
+            <div class="om-label">Başarı bonusu</div>
+          </div>
+          <div class="opp-metric">
+            <div class="om-val">ORTA</div>
+            <div class="om-label">Rekabet</div>
+          </div>
+        </div>
+        <div class="ilo-reuse">ILO'dan devralan: Lead Intelligence, Qualifier, Sentiment Engine, Follow-up sistemi, Conversation Manager. SDR = ILO'nun B2B versiyonu.</div>
+      </div>
+    </div>
+
+    <!-- 5 -->
+    <div class="opp tier-1" data-tier="TIER-1 · YÜKSEK">
+      <div class="opp-top">
+        <div class="opp-rank">5</div>
+        <div class="opp-right">
+          <div class="opp-name">E-TİCARET TAM BEYİN KATMANI</div>
+          <div class="opp-sub">Dynamic Pricing · Demand Forecast · Return Fraud · Personalization</div>
+        </div>
+      </div>
+      <div class="opp-body">
+        <div class="opp-problem">"Rakiplerim fiyat değişince haberim olmuyor. Stok tahmini elle yapılıyor, sürekli yanlış. İadelerin %15'i sahte ama tespit edemiyoruz."</div>
+        <div class="opp-solution">
+          Rakip fiyat izleme (saatlik), <strong>dinamik fiyatlama önerisi,</strong> talep tahmini (ne zaman ne kadar sipariş?), iade fotoğrafından sahtecilik tespiti (Vision AI), müşteri bazlı kişiselleştirilmiş öneri motoru. Amazon'un iç araçlarını KOBİ'ye getirmek.
+        </div>
+        <div class="opp-metrics">
+          <div class="opp-metric">
+            <div class="om-val">₺30-150K</div>
+            <div class="om-label">Setup bedeli</div>
+          </div>
+          <div class="opp-metric">
+            <div class="om-val">₺5-15K</div>
+            <div class="om-label">Aylık recurring</div>
+          </div>
+          <div class="opp-metric">
+            <div class="om-val">DÜŞÜK</div>
+            <div class="om-label">TR Rakip</div>
+          </div>
+        </div>
+        <div class="ilo-reuse">ILO'dan devralan: Price Coach, Market Intelligence, GPT-4o Vision (iade analizi), Analytics Engine, proaktif alert sistemi.</div>
+      </div>
+    </div>
+
+    <!-- 6 -->
+    <div class="opp tier-2" data-tier="TIER-2 · YÜKSEK">
+      <div class="opp-top">
+        <div class="opp-rank">6</div>
+        <div class="opp-right">
+          <div class="opp-name">FİNANSAL ZEKİ DANIŞMAN</div>
+          <div class="opp-sub">Business Intelligence · Cash Flow · "Neden zarar ediyorum?"</div>
+        </div>
+      </div>
+      <div class="opp-body">
+        <div class="opp-problem">"Muhasebecim sayıları veriyor ama ne anlama geldiğini bilmiyorum. Hangi ürünüm kazandırıyor, hangi müşterim beni batırıyor — hiçbir fikrim yok."</div>
+        <div class="opp-solution">
+          Muhasebe yazılımına (Logo, Mikro, Netsis) bağlan → <strong>haftalık CEO brifing:</strong> "Bu hafta brüt kar %3 düştü — nedeni: hammadde maliyeti. Aksiyona geçmeniz gereken 2 kalem var." Nakit akışı tahmini: "3 ay sonra sıkışacaksınız, şimdi şunu yapın."
+        </div>
+        <div class="opp-metrics">
+          <div class="opp-metric">
+            <div class="om-val">₺15-60K</div>
+            <div class="om-label">Setup bedeli</div>
+          </div>
+          <div class="opp-metric">
+            <div class="om-val">₺3-8K</div>
+            <div class="om-label">Aylık abonelik</div>
+          </div>
+          <div class="opp-metric">
+            <div class="om-val">YOK</div>
+            <div class="om-label">TR Rakip</div>
+          </div>
+        </div>
+        <div class="ilo-reuse">ILO'dan devralan: Analytics Engine, Proactive Alerts (sabah raporu), Office Analytics. Muhasebe verisi = ilanpa datası. Aynı pattern.</div>
+      </div>
+    </div>
+
+    <!-- 7 -->
+    <div class="opp tier-2" data-tier="TIER-2 · YÜKSEK">
+      <div class="opp-top">
+        <div class="opp-rank">7</div>
+        <div class="opp-right">
+          <div class="opp-name">İNSAN KAYNAKLARI AI SİSTEMİ</div>
+          <div class="opp-sub">CV Screening · Turnover Prediction · Employee Assistant</div>
+        </div>
+      </div>
+      <div class="opp-body">
+        <div class="opp-problem">"500 CV geliyor. İK ekibimiz günlerce okumakla geçiriyor. Sonra işe aldığımız kişi 3 ay sonra ayrılıyor. Tahmin edemiyoruz."</div>
+        <div class="opp-solution">
+          500 CV'yi 10 dakikada puanla + sırala. <strong>İşe alım sürecini tahmin et:</strong> "Bu aday 8 ay sonra büyük ihtimalle ayrılır." Çalışan anket verilerinden "kim mutsuz?" analizi. "İzin formumu nasıl dolduracağım?" sorusunu İK'dan kurtarma.
+        </div>
+        <div class="opp-metrics">
+          <div class="opp-metric">
+            <div class="om-val">₺40-200K</div>
+            <div class="om-label">Enterprise setup</div>
+          </div>
+          <div class="opp-metric">
+            <div class="om-val">50+ çalışan</div>
+            <div class="om-label">Hedef şirket</div>
+          </div>
+          <div class="opp-metric">
+            <div class="om-val">DÜŞÜK</div>
+            <div class="om-label">TR Rakip</div>
+          </div>
+        </div>
+        <div class="ilo-reuse">ILO'dan devralan: Qualifier (CV = lead), Lead Intelligence, Sentiment Engine (çalışan memnuniyeti), Platform Knowledge (politika Q&A).</div>
+      </div>
+    </div>
+
+    <!-- 8 -->
+    <div class="opp tier-2" data-tier="TIER-2 · YÜKSEK">
+      <div class="opp-top">
+        <div class="opp-rank">8</div>
+        <div class="opp-right">
+          <div class="opp-name">SAĞLIK AI ASISTANI</div>
+          <div class="opp-sub">Appointment AI · Patient Follow-up · Insurance Automation</div>
+        </div>
+      </div>
+      <div class="opp-body">
+        <div class="opp-problem">"Randevu iptalleri günde 12-15. Hastaları takip etmeye zamanımız yok. Sigorta ön onayları 2-3 gün sürüyor ve sekreterleri tükürüyor."</div>
+        <div class="opp-solution">
+          Randevu 24 saat + 2 saat önce hatırlatma (no-show %45 azalma). Taburcu sonrası otomatik takip: "İlaçlarınızı aldınız mı?" Sigorta ön onay formlarını <strong>otomatik doldur ve gönder.</strong> Lab sonucu hazır bildirimi + temel yorum.
+        </div>
+        <div class="opp-metrics">
+          <div class="opp-metric">
+            <div class="om-val">₺20-100K</div>
+            <div class="om-label">Klinik setup</div>
+          </div>
+          <div class="opp-metric">
+            <div class="om-val">₺200K-2M</div>
+            <div class="om-label">Hastane projesi</div>
+          </div>
+          <div class="opp-metric">
+            <div class="om-val">DÜŞÜK</div>
+            <div class="om-label">TR Rakip</div>
+          </div>
+        </div>
+        <div class="ilo-reuse">ILO'dan devralan: Proactive Scheduler (randevu hatırlatma = ilan hatırlatma), Problem Router, WhatsApp entegrasyonu, Multi-account Manager.</div>
+      </div>
+    </div>
+
+    <!-- 9 -->
+    <div class="opp tier-2" data-tier="TIER-2 · ORTA">
+      <div class="opp-top">
+        <div class="opp-rank">9</div>
+        <div class="opp-right">
+          <div class="opp-name">HUKUK BÜROSU AI PLATFORMU</div>
+          <div class="opp-sub">Contract Drafting · Client Automation · Regulation Monitor</div>
+        </div>
+      </div>
+      <div class="opp-body">
+        <div class="opp-problem">"Avukatlarımız zamanının %30'unu müvekkil nitelendirme görüşmelerine harcıyor. Birçoğu gereksiz. KVKK değişikliklerini takip etmek başlı başına iş."</div>
+        <div class="opp-solution">
+          Müvekkil ilk iletişimde <strong>otomatik nitelendirme:</strong> bütçe, konu, aciliyet. Sözleşme şablonlarından taslak üretimi. Mevzuat değişikliği izleme + "Bu değişiklik sizin davalarınızı etkiliyor" alarmı. Dava aşaması otomatik müvekkil bildirimi.
+        </div>
+        <div class="opp-metrics">
+          <div class="opp-metric">
+            <div class="om-val">₺30-150K</div>
+            <div class="om-label">Büro setup</div>
+          </div>
+          <div class="opp-metric">
+            <div class="om-val">₺5-15K</div>
+            <div class="om-label">Aylık bakım</div>
+          </div>
+          <div class="opp-metric">
+            <div class="om-val">YOK</div>
+            <div class="om-label">TR Rakip</div>
+          </div>
+        </div>
+        <div class="ilo-reuse">ILO'dan devralan: Qualifier (müvekkil = lead), Document Assistant, Platform Knowledge (hukuki bilgi tabanı), Quality Validator.</div>
+      </div>
+    </div>
+
+    <!-- 10 -->
+    <div class="opp tier-2" data-tier="TIER-2 · ORTA">
+      <div class="opp-top">
+        <div class="opp-rank">10</div>
+        <div class="opp-right">
+          <div class="opp-name">GAYRİMENKUL ZEKİ PLATFORM</div>
+          <div class="opp-sub">Property Valuation · Deal Matching · Due Diligence AI</div>
+        </div>
+      </div>
+      <div class="opp-body">
+        <div class="opp-problem">"Değerleme raporları 1 hafta sürüyor. Alıcı-satıcı eşleştirme tamamen sezgisel. Due diligence için 3 hukuk müşaviri tutuyoruz."</div>
+        <div class="opp-solution">
+          ILO'nun doğal devamı. <strong>Otomatik değerleme:</strong> konuma, emsallere, trendlere göre anlık fiyat bandı. Alıcı profili → envanter eşleştirme. Due diligence belge analizi: "Bu tapu kaydında 3 sorun var." Yatırım getirisi hesaplayıcı.
+        </div>
+        <div class="opp-metrics">
+          <div class="opp-metric">
+            <div class="om-val">₺50-200K</div>
+            <div class="om-label">Platform setup</div>
+          </div>
+          <div class="opp-metric">
+            <div class="om-val">ILO referans</div>
+            <div class="om-label">Kanıtlanmış sektör</div>
+          </div>
+          <div class="opp-metric">
+            <div class="om-val">DÜŞÜK</div>
+            <div class="om-label">TR Rakip</div>
+          </div>
+        </div>
+        <div class="ilo-reuse">ILO'dan devralan: Price Coach (gayrimenkul değerleme = fiyat analizi), Market Intelligence, Photo-to-ad (fotoğraftan özellik çıkarma), Negotiation Engine.</div>
+      </div>
+    </div>
+
+    <!-- 11 -->
+    <div class="opp tier-2" data-tier="TIER-2 · ORTA">
+      <div class="opp-top">
+        <div class="opp-rank">11</div>
+        <div class="opp-right">
+          <div class="opp-name">LOJİSTİK & OPERASYON AI</div>
+          <div class="opp-sub">Route Optimization · Demand Sensing · Anomaly Detection</div>
+        </div>
+      </div>
+      <div class="opp-body">
+        <div class="opp-problem">"Teslimat rotalarımız verimsiz. Hangi depoda ne kadar stok tutacağımızı bilmiyoruz. Gecikmeleri müşteriye bildirmek için ekip tutuyoruz."</div>
+        <div class="opp-solution">
+          Tarihsel veri + hava + trafik → <strong>teslimat süresi tahmini</strong> ve müşteriye otomatik bildirim. Stok optimizasyonu: "Bu depoda fazla ürün var, şu depoda eksik." Gecikme anomali tespiti + müşteri proaktif bilgilendirme.
+        </div>
+        <div class="opp-metrics">
+          <div class="opp-metric">
+            <div class="om-val">₺80-400K</div>
+            <div class="om-label">Proje bedeli</div>
+          </div>
+          <div class="opp-metric">
+            <div class="om-val">%10 tasarruf</div>
+            <div class="om-label">Operasyon maliyeti</div>
+          </div>
+          <div class="opp-metric">
+            <div class="om-val">ORTA</div>
+            <div class="om-label">Teknik zorluk</div>
+          </div>
+        </div>
+        <div class="ilo-reuse">ILO'dan devralan: Proactive Alerts, Analytics Engine, Conversation Manager (müşteri bildirimi), Multi-account Manager (çok depo yönetimi).</div>
+      </div>
+    </div>
+
+    <!-- 12 -->
+    <div class="opp tier-3" data-tier="TIER-3 · PLATFORM">
+      <div class="opp-top">
+        <div class="opp-rank">12</div>
+        <div class="opp-right">
+          <div class="opp-name">ÇOK KANALLI ORCHESTRASYON PLATFORMU</div>
+          <div class="opp-sub">WhatsApp + Phone + Email + SMS + Web — Tek Beyin</div>
+        </div>
+      </div>
+      <div class="opp-body">
+        <div class="opp-problem">"WhatsApp'ta bir şey söylüyorum, maile başka şey geliyor, telefonda hiçbir şeyden haberdar değiller. Müşterilerim aynı şeyi 3 kanalda tekrarlıyor."</div>
+        <div class="opp-solution">
+          Tüm kanallar tek AI beynine bağlı. Müşteri WhatsApp'ta başladı, e-maile geçti — AI konteksti kaybetmiyor. <strong>Her kanalda aynı kişilik, aynı bilgi, sıfır tekrar.</strong> Salesforce'un yaptığını 1/20 fiyata. Bu bir SaaS platformu — aylık abonelik modeli.
+        </div>
+        <div class="opp-metrics">
+          <div class="opp-metric">
+            <div class="om-val">₺1M+</div>
+            <div class="om-label">Platform değeri</div>
+          </div>
+          <div class="opp-metric">
+            <div class="om-val">SaaS model</div>
+            <div class="om-label">Ölçeklenebilir</div>
+          </div>
+          <div class="opp-metric">
+            <div class="om-val">YOK</div>
+            <div class="om-label">TR Rakip</div>
+          </div>
+        </div>
+        <div class="ilo-reuse">ILO'dan devralan: TÜM SERVİSLER. ILO = bu platformun emlak modülü. Diğer sektörler = yeni modüller. Platform = modüllerin toplamı.</div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════════════
+     REVENUE MATRIX
+══════════════════════════════════════════════════════ -->
+<section class="sec">
+  <div class="s-label">Karşılaştırmalı Analiz</div>
+  <div class="s-title">GELİR <span class="c">MATRİSİ.</span></div>
+
+  <div class="matrix-wrap">
+    <table class="matrix">
+      <thead>
+        <tr>
+          <th>Ürün</th>
+          <th>Proje Bedeli</th>
+          <th>Aylık Recurring</th>
+          <th>Satış Hızı</th>
+          <th>TR Rekabet</th>
+          <th>ILO Devir</th>
+          <th>Öncelik</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>🎙 Sesli AI Resepsiyonist</td>
+          <td><span class="mval gold">₺10-30K</span></td>
+          <td><span class="mval green">₺8-20K</span></td>
+          <td><span class="mval cyan">HIZLI</span></td>
+          <td><span class="mval green">DÜŞÜK</span></td>
+          <td>%75</td>
+          <td><span class="pri pri-1">🔥 #1</span></td>
+        </tr>
+        <tr>
+          <td>🧠 Şirket Beyni (Internal AI)</td>
+          <td><span class="mval gold">₺80-500K</span></td>
+          <td><span class="mval green">₺15-30K</span></td>
+          <td><span class="mval muted">ORTA</span></td>
+          <td><span class="mval green">YOK</span></td>
+          <td>%70</td>
+          <td><span class="pri pri-1">⭐ #2</span></td>
+        </tr>
+        <tr>
+          <td>📄 Belge Zekası</td>
+          <td><span class="mval gold">₺50-300K</span></td>
+          <td><span class="mval green">₺10-20K</span></td>
+          <td><span class="mval muted">ORTA</span></td>
+          <td><span class="mval green">YOK</span></td>
+          <td>%60</td>
+          <td><span class="pri pri-1">⭐ #3</span></td>
+        </tr>
+        <tr>
+          <td>🎯 AI SDR Sistemi</td>
+          <td><span class="mval gold">₺20-80K</span></td>
+          <td><span class="mval green">₺8-15K</span></td>
+          <td><span class="mval cyan">HIZLI</span></td>
+          <td><span class="mval cyan">ORTA</span></td>
+          <td>%80</td>
+          <td><span class="pri pri-2">#4</span></td>
+        </tr>
+        <tr>
+          <td>🛒 E-ticaret Beyin Katmanı</td>
+          <td><span class="mval gold">₺30-150K</span></td>
+          <td><span class="mval green">₺5-15K</span></td>
+          <td><span class="mval muted">ORTA</span></td>
+          <td><span class="mval green">DÜŞÜK</span></td>
+          <td>%70</td>
+          <td><span class="pri pri-2">#5</span></td>
+        </tr>
+        <tr>
+          <td>💰 Finansal Zeki Danışman</td>
+          <td><span class="mval gold">₺15-60K</span></td>
+          <td><span class="mval green">₺3-8K</span></td>
+          <td><span class="mval cyan">HIZLI</span></td>
+          <td><span class="mval green">YOK</span></td>
+          <td>%65</td>
+          <td><span class="pri pri-2">#6</span></td>
+        </tr>
+        <tr>
+          <td>👥 İK AI Sistemi</td>
+          <td><span class="mval gold">₺40-200K</span></td>
+          <td><span class="mval green">₺8-20K</span></td>
+          <td><span class="mval muted">YAVAŞ</span></td>
+          <td><span class="mval green">DÜŞÜK</span></td>
+          <td>%55</td>
+          <td><span class="pri pri-2">#7</span></td>
+        </tr>
+        <tr>
+          <td>🏥 Sağlık AI Asistanı</td>
+          <td><span class="mval gold">₺20-2M</span></td>
+          <td><span class="mval green">₺10-50K</span></td>
+          <td><span class="mval muted">YAVAŞ</span></td>
+          <td><span class="mval green">YOK</span></td>
+          <td>%75</td>
+          <td><span class="pri pri-2">#8</span></td>
+        </tr>
+        <tr>
+          <td>⚖️ Hukuk Bürosu AI</td>
+          <td><span class="mval gold">₺30-150K</span></td>
+          <td><span class="mval green">₺5-15K</span></td>
+          <td><span class="mval muted">ORTA</span></td>
+          <td><span class="mval green">YOK</span></td>
+          <td>%60</td>
+          <td><span class="pri pri-2">#9</span></td>
+        </tr>
+        <tr>
+          <td>🏠 Gayrimenkul Platform</td>
+          <td><span class="mval gold">₺50-200K</span></td>
+          <td><span class="mval green">₺8-20K</span></td>
+          <td><span class="mval cyan">HIZLI</span></td>
+          <td><span class="mval green">DÜŞÜK</span></td>
+          <td>%90</td>
+          <td><span class="pri pri-2">#10</span></td>
+        </tr>
+        <tr>
+          <td>🚚 Lojistik AI</td>
+          <td><span class="mval gold">₺80-400K</span></td>
+          <td><span class="mval green">₺15-30K</span></td>
+          <td><span class="mval muted">YAVAŞ</span></td>
+          <td><span class="mval cyan">ORTA</span></td>
+          <td>%40</td>
+          <td><span class="pri pri-3">#11</span></td>
+        </tr>
+        <tr>
+          <td>🔀 Çok Kanallı Platform</td>
+          <td><span class="mval gold">₺1M+</span></td>
+          <td><span class="mval green">SaaS</span></td>
+          <td><span class="mval muted">ÇOK YAVAŞ</span></td>
+          <td><span class="mval green">YOK</span></td>
+          <td>%95</td>
+          <td><span class="pri pri-3">#12 uzun vade</span></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════════════
+     VOICE AI DEEP DIVE
+══════════════════════════════════════════════════════ -->
+<section class="sec sec-dark">
+  <div class="s-label">En Yüksek Öncelik — Derinlemesine</div>
+  <div class="s-title">#1: SESLİ AI<br><span class="c">RESEPSIYONIST.</span></div>
+  <div style="font-size:15px;color:var(--muted);margin-bottom:48px;max-width:600px;line-height:1.8;font-family:'Courier Prime',monospace;">WhatsApp'tan 5x büyük pazar. Her Türk işletmesinin telefonu var. Ses AI → Türkçe → hâlâ çözülmemiş.</div>
+
+  <div class="voice-layout">
+    <div class="voice-side">
+      <div class="voice-stat-big">%72</div>
+      <div class="voice-stat-label">// Aynı 5 soruyu tekrarlayan çağrı oranı</div>
+
+      <div class="call-types">
+        <div class="call-row">
+          <div class="call-pct">%28</div>
+          <div class="call-label">Çalışma saati / adres sorgusu</div>
+          <div class="call-ai yes">AI ✓</div>
+        </div>
+        <div class="call-row">
+          <div class="call-pct">%22</div>
+          <div class="call-label">Randevu alma / iptal</div>
+          <div class="call-ai yes">AI ✓</div>
+        </div>
+        <div class="call-row">
+          <div class="call-pct">%18</div>
+          <div class="call-label">Sipariş / servis durumu</div>
+          <div class="call-ai yes">AI ✓</div>
+        </div>
+        <div class="call-row">
+          <div class="call-pct">%4</div>
+          <div class="call-label">Fiyat bilgisi</div>
+          <div class="call-ai yes">AI ✓</div>
+        </div>
+        <div class="call-row">
+          <div class="call-pct">%18</div>
+          <div class="call-label">Şikayet / karmaşık soru</div>
+          <div class="call-ai no">İNSAN →</div>
+        </div>
+        <div class="call-row">
+          <div class="call-pct">%10</div>
+          <div class="call-label">Satış görüşmesi</div>
+          <div class="call-ai no">İNSAN →</div>
+        </div>
+      </div>
+
+      <div style="margin-top:20px;padding:16px;background:var(--ink3);border:1px solid var(--border);">
+        <div style="font-family:'Courier Prime',monospace;font-size:10px;color:var(--cyan);letter-spacing:2px;margin-bottom:10px;">SONUÇ:</div>
+        <div style="font-size:14px;color:var(--white);line-height:1.7;">Gelen çağrıların <strong style="color:var(--gold);">%72'si</strong> AI tarafından tam olarak çözülebilir. Sadece %28'i insana geçiyor. Resepsiyonist için ödenen paranın %72'si sıfır değer üretiyor.</div>
+      </div>
+    </div>
+
+    <div class="voice-side" style="background:var(--ink2);">
+      <div class="roi-calc">
+        <div class="roi-header">// DENTAL KLİNİK ROI HESABI — ÖRNEK</div>
+        <div class="roi-row">
+          <span class="roi-name">Mevcut: 2 resepsiyonist</span>
+          <span class="roi-val cost">-₺18.000/ay</span>
+        </div>
+        <div class="roi-row">
+          <span class="roi-name">Resepsiyonist hataları (kayıp randevu, yanlış bilgi)</span>
+          <span class="roi-val cost">-₺4.000/ay tahmini</span>
+        </div>
+        <div class="roi-row">
+          <span class="roi-name">Mesai dışı kaçırılan çağrılar</span>
+          <span class="roi-val cost">-₺6.000/ay tahmini</span>
+        </div>
+        <div class="roi-row" style="border-top:2px solid var(--border);">
+          <span class="roi-name">AI Resepsiyonist (kurulum amortismanı dahil)</span>
+          <span class="roi-val cost">-₺6.000/ay</span>
+        </div>
+        <div class="roi-row">
+          <span class="roi-name">Kalan insan resepsiyonist (1 kişi, odak: satış)</span>
+          <span class="roi-val cost">-₺9.000/ay</span>
+        </div>
+        <div class="roi-row" style="background:rgba(22,163,74,0.05);">
+          <span class="roi-name" style="color:var(--white);font-weight:600;">Aylık net tasarruf</span>
+          <span class="roi-val total">+₺13.000</span>
+        </div>
+        <div class="roi-row" style="background:rgba(22,163,74,0.08);">
+          <span class="roi-name" style="color:var(--white);">Yıllık ROI</span>
+          <span class="roi-val gain">₺156.000</span>
+        </div>
+      </div>
+
+      <div style="margin-top:20px;">
+        <div class="vt-title">// TEKNİK STACK</div>
+        <div class="tech-stack-pills">
+          <span class="tp core">Twilio Voice API</span>
+          <span class="tp core">ElevenLabs TTS</span>
+          <span class="tp core">GPT-4o Realtime</span>
+          <span class="tp core">Deepgram STT</span>
+          <span class="tp">Google Calendar API</span>
+          <span class="tp">Türkçe NLP</span>
+          <span class="tp">Ses Duygu Analizi</span>
+          <span class="tp">Çağrı Kaydı</span>
+          <span class="tp">CRM Entegrasyon</span>
+          <span class="tp">Whatsapp Yedek</span>
+        </div>
+      </div>
+
+      <div style="margin-top:20px;padding:16px;background:var(--ink);border:1px solid rgba(6,182,212,0.15);font-family:'Courier Prime',monospace;font-size:12px;color:var(--cyan);line-height:1.8;">
+        ILO'DAN DEVREDEN → <span style="color:var(--text);">Problem Router (çağrı kategorilendirme), Quality Validator (yanlış bilgi engelleme), Human handoff sistemi, Proactive Scheduler (çağrı geri arama). Yeni öğrenilecek: Twilio + ElevenLabs API'ları. Süre: 3-4 hafta.</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════════════
+     ENTERPRISE BRAIN
+══════════════════════════════════════════════════════ -->
+<section class="sec">
+  <div class="s-label">En Yüksek Tek Kontrat</div>
+  <div class="s-title">#2: ŞİRKET<br><span class="a">BEYNİ.</span><br><span class="dim">₺500K KONTRAT.</span></div>
+
+  <div class="brain-layout" style="margin-top:48px;">
+    <div class="brain-left">
+      <div style="font-family:'Courier Prime',monospace;font-size:10px;color:var(--cyan);letter-spacing:2px;margin-bottom:20px;">// PROBLEM BOYUTU</div>
+      <div style="font-size:18px;color:var(--white);line-height:1.7;margin-bottom:28px;">
+        Ortalama 200 çalışanlı şirkette bilgi şu formatlarda dağılmış durumda:
+      </div>
+      <div style="display:flex;flex-direction:column;gap:8px;">
+        <div style="display:flex;justify-content:space-between;padding:12px 16px;background:var(--ink2);border:1px solid var(--border);font-size:13px;">
+          <span style="color:var(--text);">PDF Dokümanlar</span>
+          <span style="font-family:'Courier Prime',monospace;color:var(--gold);">340+ dosya</span>
+        </div>
+        <div style="display:flex;justify-content:space-between;padding:12px 16px;background:var(--ink2);border:1px solid var(--border);font-size:13px;">
+          <span style="color:var(--text);">E-posta arşivi</span>
+          <span style="font-family:'Courier Prime',monospace;color:var(--gold);">50.000+</span>
+        </div>
+        <div style="display:flex;justify-content:space-between;padding:12px 16px;background:var(--ink2);border:1px solid var(--border);font-size:13px;">
+          <span style="color:var(--text);">Toplantı notları</span>
+          <span style="font-family:'Courier Prime',monospace;color:var(--gold);">Kayıpsız</span>
+        </div>
+        <div style="display:flex;justify-content:space-between;padding:12px 16px;background:var(--ink2);border:1px solid var(--border);font-size:13px;">
+          <span style="color:var(--text);">Süreç bilgisi</span>
+          <span style="font-family:'Courier Prime',monospace;color:var(--gold);">Kafada!</span>
+        </div>
+        <div style="display:flex;justify-content:space-between;padding:12px 16px;background:var(--ink2);border:1px solid var(--border);font-size:13px;">
+          <span style="color:var(--text);">Müşteri geçmişi</span>
+          <span style="font-family:'Courier Prime',monospace;color:var(--gold);">CRM'de dağınık</span>
+        </div>
+      </div>
+
+      <div style="margin-top:24px;padding:20px;background:rgba(245,158,11,0.06);border:1px solid rgba(245,158,11,0.2);border-left:3px solid var(--gold);">
+        <div style="font-family:'Courier Prime',monospace;font-size:11px;color:var(--gold);letter-spacing:1px;margin-bottom:8px;">SONUÇ:</div>
+        <div style="font-size:14px;color:var(--text);line-height:1.7;">Yöneticiler günde ortalama <strong style="color:var(--white);">2.3 saat</strong> bilgi aramakla veya aynı soruları yanıtlamakla geçiriyor. 200 çalışan × 2.3 saat = <strong style="color:var(--gold);">460 adam/saati kayıp her gün.</strong></div>
+      </div>
+    </div>
+
+    <div class="brain-right">
+      <div style="font-family:'Courier Prime',monospace;font-size:10px;color:var(--cyan);letter-spacing:2px;margin-bottom:4px;">// KULLANIM SENARYOLARI</div>
+
+      <div class="use-case">
+        <div class="uc-icon">👔</div>
+        <div>
+          <div class="uc-title">CEO Sabah Brifing</div>
+          <div class="uc-text">Otomatik: dün ne satıldı, hangi müşteri şikayet etti, bugün ne var. 5 dakikada CEO'nun ihtiyacı olan her şey.</div>
+          <div class="uc-roi">→ Yönetici verimliliği +%40</div>
+        </div>
+      </div>
+      <div class="use-case">
+        <div class="uc-icon">📋</div>
+        <div>
+          <div class="uc-title">İK Politika Asistanı</div>
+          <div class="uc-text">"Evlilik izni kaç gün?" "Seyahat masrafını nasıl gönderiyorum?" — İK'yı aramak yerine AI soruluyor.</div>
+          <div class="uc-roi">→ İK ekibi günde 3 saat kazanıyor</div>
+        </div>
+      </div>
+      <div class="use-case">
+        <div class="uc-icon">🔬</div>
+        <div>
+          <div class="uc-title">Satış Hazırlık Motoru</div>
+          <div class="uc-text">Müşteri toplantısı öncesi: "Bu müşteriyle son 3 ayda ne konuştuk? Ne söz verdik?" — 30 saniyede özet.</div>
+          <div class="uc-roi">→ Satış döngüsü %25 kısalıyor</div>
+        </div>
+      </div>
+      <div class="use-case">
+        <div class="uc-icon">⚖️</div>
+        <div>
+          <div class="uc-title">Uyum & KVKK Kontrolü</div>
+          <div class="uc-text">"Bu kampanya KVKK'ya uygun mu?" — Hukuki ekip yerine saniyede cevap. Regülasyon değişirse sistem otomatik uyarıyor.</div>
+          <div class="uc-roi">→ Hukuki risk %60 azalıyor</div>
+        </div>
+      </div>
+      <div class="use-case">
+        <div class="uc-icon">🆕</div>
+        <div>
+          <div class="uc-title">Yeni Çalışan Onboarding</div>
+          <div class="uc-text">İlk gün: tüm sorular cevaplandı. Ürün, süreç, kültür, sistem — 2 haftada değil 2 günde.</div>
+          <div class="uc-roi">→ Onboarding süresi %60 kısalıyor</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════════════
+     İNŞA SIRASI
+══════════════════════════════════════════════════════ -->
+<section class="sec sec-dark">
+  <div class="s-label">Stratejik Yol Haritası</div>
+  <div class="s-title">NE ZAMAN<br><span class="c">NE İNŞA</span><br>EDİLİR?</div>
+  <div style="font-size:15px;color:var(--muted);margin-bottom:48px;max-width:560px;line-height:1.8;font-family:'Courier Prime',monospace;">Her adım bir öncekinin hem müşterisini hem de teknik altyapısını bir sonrakine taşıyor.</div>
+
+  <div class="build-order">
+
+    <div class="bo-row">
+      <div class="bo-num">1</div>
+      <div class="bo-content">
+        <div style="flex:1;">
+          <div class="bo-phase">ŞİMDİ · AY 1-2</div>
+          <div class="bo-name">WhatsApp AI Agent — Diğer Sektörler</div>
+          <div class="bo-why">ILO altyapısını farklı sektörlere uygula. <strong>Diş kliniği, restoran, emlak ofisi, hukuk bürosu.</strong> Her biri 2-3 haftada teslim. Hızlı gelir, hızlı referans. "Sektörünüzde yaptım" demek için.</div>
+        </div>
+        <div class="bo-meta">
+          <div class="bo-revenue">₺5-15K/proje</div>
+          <div class="bo-time">3-5 proje/ay mümkün</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="bo-row">
+      <div class="bo-num">2</div>
+      <div class="bo-content">
+        <div style="flex:1;">
+          <div class="bo-phase">AY 2-3 · PARALEL GELİŞTİR</div>
+          <div class="bo-name">Sesli AI Resepsiyonist — MVP</div>
+          <div class="bo-why">WhatsApp geliri devam ederken Twilio + ElevenLabs entegrasyonunu öğren. <strong>İlk ses müşterisi için 1 sektörde demo hazırla.</strong> Dental klinikleri başlangıç için mükemmel — çok fazla çağrı, net ROI, hızlı karar verici.</div>
+        </div>
+        <div class="bo-meta">
+          <div class="bo-revenue">₺8-20K/ay recurring</div>
+          <div class="bo-time">1 müşteri = referans makinesi</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="bo-row">
+      <div class="bo-num">3</div>
+      <div class="bo-content">
+        <div style="flex:1;">
+          <div class="bo-phase">AY 3-5 · BÜYÜK KONTRAT</div>
+          <div class="bo-name">İlk Şirket Beyni Projesi</div>
+          <div class="bo-why">WhatsApp + Ses gelirleriyle artık 50-200K TL'lik proje için pazarlık gücün var. <strong>Referansların var, vaka çalışmaların var.</strong> 100-500 çalışanlı bir şirket hedefle. Bir satış konuşması = aylarca gelir.</div>
+        </div>
+        <div class="bo-meta">
+          <div class="bo-revenue">₺80-200K proje</div>
+          <div class="bo-time">+₺15K/ay bakım</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="bo-row">
+      <div class="bo-num">4</div>
+      <div class="bo-content">
+        <div style="flex:1;">
+          <div class="bo-phase">AY 5-8 · ÜRÜNLEŞTIRME</div>
+          <div class="bo-name">Dikey SaaS — Tek Sektörde Derinleş</div>
+          <div class="bo-why">En çok müşterin olan sektörü seç. "Dental klinikler için AI platformu" ya da "Emlak ofisleri için AI sistemi." <strong>Tekrar tekrar satılabilir, özelleştirme azalıyor, marj artıyor.</strong> Bu aşamada satışçı tutmayı düşün.</div>
+        </div>
+        <div class="bo-meta">
+          <div class="bo-revenue">Aylık ₺50-150K</div>
+          <div class="bo-time">SaaS → exponential</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="bo-row">
+      <div class="bo-num">5</div>
+      <div class="bo-content">
+        <div style="flex:1;">
+          <div class="bo-phase">AY 8-18 · PLATFORM</div>
+          <div class="bo-name">Çok Kanallı AI Orchestrasyon Platformu</div>
+          <div class="bo-why">Artık WhatsApp + Ses + İç Sistem entegrasyonunu biliyorsun. Bunları tek bir ürüne birleştir. <strong>Müşterilerin aylık abonelik öder.</strong> Ekip kur, yatırım al ya da stratejik satış — seçim senindir.</div>
+        </div>
+        <div class="bo-meta">
+          <div class="bo-revenue">₺500K+ aylık potansiyel</div>
+          <div class="bo-time">Exit: ₺5M-50M değerleme</div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════════════
+     COMPOUND EFFECT
+══════════════════════════════════════════════════════ -->
+<section class="sec">
+  <div class="s-label">Bileşik Etki Hesabı</div>
+  <div class="s-title">6 AY SONRA<br><span class="g">NASIL</span><br><span class="dim">GÖRÜNÜYOR?</span></div>
+
+  <div class="compound-grid" style="margin-top:48px;">
+
+    <div class="compound-col">
+      <div class="cc-month">AY 1</div>
+      <div class="cc-clients">2</div>
+      <div class="cc-label">aktif müşteri</div>
+      <div class="cc-revenue c1">₺12K</div>
+      <div class="cc-rev-label">aylık gelir</div>
+      <div class="cc-products">
+        <div class="cc-product">WhatsApp Agent × 2</div>
+        <div class="cc-product">İlk referanslar</div>
+        <div class="cc-product">Ses MVP geliştiriliyor</div>
+      </div>
+    </div>
+
+    <div class="compound-col">
+      <div class="cc-month">AY 2-3</div>
+      <div class="cc-clients">6</div>
+      <div class="cc-label">aktif müşteri</div>
+      <div class="cc-revenue c2">₺45K</div>
+      <div class="cc-rev-label">aylık gelir</div>
+      <div class="cc-products">
+        <div class="cc-product">WhatsApp × 4</div>
+        <div class="cc-product">Ses Agent × 1 (yeni)</div>
+        <div class="cc-product">Belge AI × 1 (yeni)</div>
+        <div class="cc-product">LinkedIn inbound geliyor</div>
+      </div>
+    </div>
+
+    <div class="compound-col active">
+      <div class="cc-month">AY 4-5</div>
+      <div class="cc-clients">12</div>
+      <div class="cc-label">aktif müşteri</div>
+      <div class="cc-revenue c3">₺110K</div>
+      <div class="cc-rev-label">aylık gelir</div>
+      <div class="cc-products">
+        <div class="cc-product">WhatsApp × 6</div>
+        <div class="cc-product">Ses × 3</div>
+        <div class="cc-product">İlk Şirket Beyni projesi</div>
+        <div class="cc-product">Referans %50 kaynak</div>
+      </div>
+    </div>
+
+    <div class="compound-col">
+      <div class="cc-month">AY 6+</div>
+      <div class="cc-clients">20+</div>
+      <div class="cc-label">aktif müşteri</div>
+      <div class="cc-revenue c4">₺200K+</div>
+      <div class="cc-rev-label">aylık gelir</div>
+      <div class="cc-products">
+        <div class="cc-product">WhatsApp × 8 (recurring)</div>
+        <div class="cc-product">Ses × 5 (recurring)</div>
+        <div class="cc-product">Şirket Beyni × 2</div>
+        <div class="cc-product">Dikey SaaS başlıyor</div>
+        <div class="cc-product">İlk satışçı işe alımı</div>
+      </div>
+    </div>
+
+  </div>
+
+  <div style="margin-top:1px;background:var(--ink2);border:1px solid var(--border);padding:32px 40px;display:flex;gap:60px;align-items:center;flex-wrap:wrap;">
+    <div>
+      <div style="font-family:'Courier Prime',monospace;font-size:10px;color:var(--cyan);letter-spacing:2px;margin-bottom:8px;">NEDEN BU MÜMKÜN?</div>
+      <div style="font-size:15px;color:var(--text);line-height:1.8;max-width:600px;">Her yeni ürün öncekinin altyapısını kullanıyor. Her müşteri referans olarak bir sonrakini getiriyor. Pazar boş — Türkiye'de gerçek rakip yok. ILO sana %80 hazır teknik altyapı bıraktı.</div>
+    </div>
+    <div style="flex-shrink:0;text-align:center;">
+      <div style="font-family:'Anton',sans-serif;font-size:72px;color:var(--gold);line-height:1;letter-spacing:1px;">₺2.4M</div>
+      <div style="font-family:'Courier Prime',monospace;font-size:11px;color:var(--muted);margin-top:4px;letter-spacing:1px;">Yıllık hedef gelir — Ay 12</div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════════════
+     FINAL
+══════════════════════════════════════════════════════ -->
+<section class="final">
+  <div class="final-stamp">
+    <div class="stamp">GİZLİ</div>
+    <div class="stamp stamp-green">AKSİYONA GEÇ</div>
+  </div>
+
+  <h2>
+    ILO BİR<br>
+    <span class="c">BAŞLANGIÇ.</span><br>
+    <span class="dim">PLATFORM</span><br>
+    SONDA.
+  </h2>
+
+  <div class="final-sub">
+    // Her büyük teknoloji şirketi bir spesifik problemi çözerek başladı.<br>
+    // Senin projenin: Türk işletmelerine AI zekası getirmek.<br>
+    // Araç: WhatsApp'tan başladı. Hedef: Her kanal, her sektör.<br>
+    // Zaman: Şimdi. Rakip: Henüz yok.
+  </div>
+</section>
+
+<footer>
+  <span>DOC-ID: AI-OPP-2026-001</span>
+  <span>12 FIRSAT · ₺200K+ AYLIK HEDEF · 6 AYDA</span>
+  <span>GİZLİ · SADECE DAHİLİ KULLANIM</span>
+</footer>
+
+</body>
+</html>
